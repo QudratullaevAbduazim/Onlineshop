@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card shadow border-0">
+                <div class="card-body p-5">
+                    <h2 class="text-center mb-4 fw-bold">Tizimga kirish</h2>
+                    
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Foydalanuvchi nomi</label>
+                            {{ form.username }}
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Parol</label>
+                            {{ form.password }}
+                        </div>
+
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-dark btn-lg">Kirish</button>
+                        </div>
+                    </form>
+
+                    <div class="text-center mt-4">
+                        <p class="mb-0">Hali ro'yxatdan o'tmadingizmi? <a href="{% url 'register' %}" class="text-decoration-none fw-bold text-primary">Ro'yxatdan o'tish</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    input[type="text"], input[type="password"] {
+        display: block; width: 100%; padding: 0.375rem 0.75rem;
+        font-size: 1rem; border: 1px solid #ced4da; border-radius: 0.375rem;
+    }
+</style>
+{% endblock %}

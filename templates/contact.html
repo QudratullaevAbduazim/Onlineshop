@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="row g-5">
+            <div class="col-md-6">
+                <h2 class="fw-bold mb-4">Biz bilan bog'laning</h2>
+                <p class="text-muted">Savollaringiz yoki takliflaringiz bo'lsa, quyidagi shaklni to'ldiring yoki bizga qo'ng'iroq qiling.</p>
+                
+                <div class="mt-4">
+                    <p><strong>Manzil:</strong> Toshkent sh., Chilonzor tumani, 10-kvartal</p>
+                    <p><strong>Telefon:</strong> +998 90 123 45 67</p>
+                    <p><strong>Email:</strong> info@onlineshop.uz</p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card shadow-sm p-4">
+                    <form>
+                        <div class="mb-3">
+                            <label class="form-label">Ismingiz</label>
+                            <input type="text" class="form-control" placeholder="Ismingizni yozing">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" placeholder="Emailingizni yozing">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Xabar</label>
+                            <textarea class="form-control" rows="4" placeholder="Xabaringizni yozing"></textarea>
+                        </div>
+                        <button type="button" class="btn btn-dark w-100">Yuborish</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

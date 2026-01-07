@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+
+{% block title %}Hamyon - N72 Shop{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            
+            <div class="card shadow-lg border-0 bg-dark text-white mb-4">
+                <div class="card-body p-5 text-center">
+                    <i class="fas fa-wallet fa-3x mb-3 text-warning"></i>
+                    <h5 class="text-uppercase opacity-75">Sizning balansingiz</h5>
+                    <h1 class="display-3 fw-bold mb-0">{{ wallet.balance }} <span class="fs-4">so'm</span></h1>
+                </div>
+                <div class="card-footer bg-secondary bg-opacity-25 border-0 p-4">
+                    <form action="{% url 'wallet_topup' %}" method="POST" class="row g-2 justify-content-center">
+                        {% csrf_token %}
+                        <div class="col-auto">
+                            <input type="number" name="amount" class="form-control rounded-pill" placeholder="Summani kiriting" required min="1000">
+                        </div>
+                        <div class="col-auto">
+                            <button type="submit" class="btn btn-warning fw-bold px-4 rounded-pill">
+                                <i class="fas fa-plus-circle me-1"></i> To'ldirish
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0 fw-bold"><i class="fas fa-history me-2"></i>Oxirgi amallar</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Sana</th>
+                                    <th>Turi</th>
+                                    <th>Status</th>
+                                    <th class="text-end">Summa</th>
+                                    <th class="text-center">Amal</th> </tr>
+                            </thead>
+                            <tbody>
+                                {% for transaction in transactions %}
+                                <tr>
+                                    <td class="small text-muted">{{ transaction.created_at|date:"d.m.Y H:i" }}</td>
+                                    <td>
+                                        {% if transaction.transaction_type == 'topup' %}
+                                            <span class="text-primary"><i class="fas fa-arrow-up me-1"></i> Kirim</span>
+                                        {% else %}
+                                            <span class="text-danger"><i class="fas fa-shopping-bag me-1"></i> Xarid</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if transaction.is_approved %}
+                                            <span class="badge bg-success rounded-pill">Tasdiqlandi</span>
+                                        {% else %}
+                                            <span class="badge bg-warning text-dark rounded-pill">Kutilmoqda</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end fw-bold">
+                                        {% if transaction.transaction_type == 'topup' %}
+                                            <span class="text-success">+{{ transaction.amount }}</span>
+                                        {% else %}
+                                            <span class="text-danger">-{{ transaction.amount }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center"> {% if not transaction.is_approved %}
+                                        <form action="{% url 'transaction_cancel' transaction.pk %}" method="POST" onsubmit="return confirm('Haqiqatdan ham ushbu amalni bekor qilmoqchimisiz?')">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-outline-danger border-0">
+                                                <i class="fas fa-times-circle"></i> Bekor qilish
+                                            </button>
+                                        </form>
+                                        {% else %}
+                                            <i class="fas fa-check-double text-muted small"></i>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center py-5 text-muted">
+                                        <i class="fas fa-folder-open fa-2x mb-2 d-block opacity-25"></i>
+                                        Hozircha amallar mavjud emas.
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mt-4">
+                <a href="{% url 'cart' %}" class="btn btn-link text-decoration-none text-muted">
+                    <i class="fas fa-arrow-left me-1"></i> Savatchaga qaytish
+                </a>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<style>
+    .card { transition: transform 0.2s; }
+    .table thead th { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; }
+    .badge { font-weight: 500; font-size: 0.75rem; }
+    .btn-outline-danger:hover { background-color: #dc3545; color: white; }
+</style>
+{% endblock %}

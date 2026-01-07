@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-5">
+        <div class="col-md-10 mx-auto">
+            <form action="{% url 'index' %}" method="get" class="d-flex shadow-sm rounded-pill overflow-hidden bg-white border">
+                <input type="text" name="q" class="form-control border-0 px-4 py-3"
+                       placeholder="Mahsulot nomini yoki tavsifini yozing..."
+                       value="{{ request.GET.q|default:'' }}">
+                <button type="submit" class="btn btn-dark px-5 rounded-pill m-1">
+                    <i class="fas fa-search me-2"></i> Qidirish
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-3 mb-4">
+            <div class="card border-0 shadow-sm sticky-top" style="top: 20px;">
+                <div class="card-header bg-dark text-white fw-bold">
+                    <i class="fas fa-list me-2"></i> Kategoriyalar
+                </div>
+                <div class="list-group list-group-flush">
+                    <a href="{% url 'index' %}"
+                       class="list-group-item list-group-item-action {% if not current_category %}active{% endif %}">
+                        Barcha mahsulotlar
+                    </a>
+                    {% for category in categories %}
+                        <a href="?category={{ category.id }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
+                           class="list-group-item list-group-item-action d-flex justify-content-between align-items-center {% if current_category == category.id|stringformat:'i' %}active{% endif %}">
+                            {{ category.name }}
+                            <span class="badge bg-secondary rounded-pill">{{ category.product_set.count }}</span>
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-9">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="fw-bold">
+                    {% if current_category %}
+                        {% for cat in categories %}{% if current_category == cat.id|stringformat:'i' %}{{ cat.name }}{% endif %}{% endfor %}
+                    {% else %}
+                        Bizning Mahsulotlar
+                    {% endif %}
+                </h3>
+                <span class="text-muted">{{ products.count }} ta mahsulot topildi</span>
+            </div>
+
+            {% if products %}
+            <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+                {% for product in products %}
+                <div class="col">
+                    <div class="card h-100 shadow-sm border-0 product-card overflow-hidden">
+                        <div class="position-relative">
+                            {% if product.image %}
+                                <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}" style="height: 220px; object-fit: cover;">
+                            {% else %}
+                                <div class="bg-light d-flex align-items-center justify-content-center text-muted" style="height: 220px;">
+                                    <i class="fas fa-image fa-3x"></i>
+                                </div>
+                            {% endif %}
+
+                            {% if product.quantity < 5 and product.quantity > 0 %}
+                                <span class="position-absolute top-0 end-0 m-2 badge bg-warning text-dark">Kam qoldi!</span>
+                            {% elif product.quantity == 0 %}
+                                <span class="position-absolute top-0 end-0 m-2 badge bg-danger text-white">Sotuvda yo'q</span>
+                            {% endif %}
+                        </div>
+
+                        <div class="card-body">
+                            <h5 class="card-title fw-bold text-truncate">{{ product.name }}</h5>
+                            <p class="card-text text-muted small mb-2">{{ product.description|truncatewords:8 }}</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="h5 mb-0 text-success fw-bold">{{ product.price }} so'm</span>
+                            </div>
+                        </div>
+
+                        <div class="card-footer bg-white border-0 d-flex gap-2 pb-3">
+                            <a href="{% url 'product_detail' product.id %}" class="btn btn-outline-dark flex-grow-1 shadow-sm">
+                                <i class="fas fa-eye"></i> Batafsil
+                            </a>
+
+                            {% if product.quantity > 0 %}
+                            <form action="{% url 'add_to_cart' product.id %}" method="post">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-primary shadow-sm px-3" title="Savatchaga qo'shish">
+                                    <i class="fas fa-cart-plus"></i>
+                                </button>
+                            </form>
+                            {% else %}
+                            <button class="btn btn-secondary disabled px-3">
+                                <i class="fas fa-ban"></i>
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-search-minus fa-4x text-muted mb-3"></i>
+                <h4 class="text-muted">Hech qanday mahsulot topilmadi</h4>
+                <a href="{% url 'index' %}" class="btn btn-primary mt-3">Barcha mahsulotlarga qaytish</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .product-card { transition: transform 0.3s ease; }
+    .product-card:hover { transform: translateY(-5px); }
+    .list-group-item.active { background-color: #212529; border-color: #212529; }
+</style>
+{% endblock %}

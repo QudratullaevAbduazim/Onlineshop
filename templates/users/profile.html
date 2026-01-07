@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <!-- PROFIL MA'LUMOTLARI -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">Profil ma'lumotlari</h5>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        {% if user.profile.image %}
+                            <img src="{{ user.profile.image.url }}"
+                                 class="rounded-circle border"
+                                 style="width: 120px; height: 120px; object-fit: cover;">
+                        {% else %}
+                            <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center border"
+                                 style="width: 120px; height: 120px;">
+                                <i class="fas fa-user fa-3x text-secondary"></i>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Foydalanuvchi nomi</label>
+                            {{ user_form.username }}
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Email</label>
+                            {{ user_form.email }}
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Profil rasmi</label>
+                            {{ profile_form.image }}
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" name="update_profile" class="btn btn-dark">
+                                Profilni saqlash
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAROL O‘ZGARTIRISH -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Parolni o'zgartirish</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        {% csrf_token %}
+                        {% for field in password_form %}
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold">{{ field.label }}</label>
+                                {{ field }}
+                                {% if field.errors %}
+                                    <div class="text-danger small">{{ field.errors }}</div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                        <div class="d-grid">
+                            <button type="submit" name="update_password" class="btn btn-primary">
+                                Parolni yangilash
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🔥 ADMIN / USER QO‘SHGAN MAHSULOTLAR -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Mening mahsulotlarim</h5>
+                    <a href="{% url 'product_add' %}" class="btn btn-light btn-sm">
+                        + Mahsulot qo‘shish
+                    </a>
+                </div>
+
+                <div class="card-body">
+                    {% if products %}
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Nomi</th>
+                                        <th>Narxi</th>
+                                        <th>Holati</th>
+                                        <th class="text-end">Amallar</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for product in products %}
+                                    <tr>
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>{{ product.name }}</td>
+                                        <td>{{ product.price }}</td>
+                                        <td>
+                                            {% if product.is_active %}
+                                                <span class="badge bg-success">Faol</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">Noaktiv</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-end">
+                                            <a href="{% url 'product_detail' product.pk %}" class="btn btn-sm btn-info">
+                                                Ko‘rish
+                                            </a>
+                                            <a href="{% url 'product_update' product.pk %}" class="btn btn-sm btn-warning">
+                                                Tahrirlash
+                                            </a>
+                                            <a href="{% url 'product_delete' product.pk %}" class="btn btn-sm btn-danger">
+                                                O‘chirish
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted mb-0">Hozircha mahsulot qo‘shilmagan.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

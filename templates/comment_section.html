@@ -1,0 +1,33 @@
+<div class="card shadow-sm border-0">
+    <div class="card-body">
+        <h4 class="mb-4">Mijozlar fikrlari</h4>
+
+        {% if user.is_authenticated %}
+            <form method="post" action="" class="mb-4">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <textarea name="body" class="form-control" rows="3" placeholder="Fikringizni yozing..." required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary btn-sm">Yuborish</button>
+            </form>
+        {% else %}
+            <p class="text-muted small"><a href="{% url 'login' %}">Kirish</a> qiling va fikr qoldiring.</p>
+        {% endif %}
+
+        <hr>
+
+        <div class="comments-list">
+            {% for comment in product.comments.all %}
+                <div class="mb-3 p-2 border-bottom">
+                    <div class="d-flex justify-content-between">
+                        <strong>{{ comment.user.username }}</strong>
+                        <small class="text-muted">{{ comment.created_at|date:"d.m.Y" }}</small>
+                    </div>
+                    <p class="mb-0 small">{{ comment.body }}</p>
+                </div>
+            {% empty %}
+                <p class="text-center text-muted py-3">Hozircha izohlar yo'q. Birinchi bo'lib fikr bildiring!</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
