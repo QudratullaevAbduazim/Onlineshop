@@ -1,33 +1,381 @@
-<div class="card shadow-sm border-0">
-    <div class="card-body">
-        <h4 class="mb-4">Mijozlar fikrlari</h4>
+<style>
+    .comments-card {
+        background: white;
+        border-radius: 25px;
+        padding: 40px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        margin-top: 30px;
+        animation: fadeInUp 0.6s ease;
+    }
 
-        {% if user.is_authenticated %}
-            <form method="post" action="" class="mb-4">
-                {% csrf_token %}
-                <div class="mb-3">
-                    <textarea name="body" class="form-control" rows="3" placeholder="Fikringizni yozing..." required></textarea>
-                </div>
-                <button type="submit" class="btn btn-primary btn-sm">Yuborish</button>
-            </form>
-        {% else %}
-            <p class="text-muted small"><a href="{% url 'login' %}">Kirish</a> qiling va fikr qoldiring.</p>
-        {% endif %}
+    .comments-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 35px;
+        padding-bottom: 20px;
+        border-bottom: 3px solid #667eea;
+    }
 
-        <hr>
+    .comments-header i {
+        font-size: 1.8rem;
+        color: #667eea;
+    }
 
-        <div class="comments-list">
-            {% for comment in product.comments.all %}
-                <div class="mb-3 p-2 border-bottom">
-                    <div class="d-flex justify-content-between">
-                        <strong>{{ comment.user.username }}</strong>
-                        <small class="text-muted">{{ comment.created_at|date:"d.m.Y" }}</small>
-                    </div>
-                    <p class="mb-0 small">{{ comment.body }}</p>
-                </div>
-            {% empty %}
-                <p class="text-center text-muted py-3">Hozircha izohlar yo'q. Birinchi bo'lib fikr bildiring!</p>
-            {% endfor %}
+    .comments-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #2d3748;
+        margin: 0;
+    }
+
+    .comment-form {
+        background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+        border-radius: 20px;
+        padding: 30px;
+        margin-bottom: 35px;
+        border: 2px solid #e2e8f0;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 12px;
+        font-size: 1.05rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .form-label i {
+        color: #667eea;
+    }
+
+    .comment-textarea {
+        width: 100%;
+        padding: 18px 20px;
+        border: 2px solid #e2e8f0;
+        border-radius: 15px;
+        font-size: 1.05rem;
+        transition: all 0.3s ease;
+        background: white;
+        resize: vertical;
+        min-height: 120px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .comment-textarea:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    }
+
+    .comment-textarea::placeholder {
+        color: #a0aec0;
+    }
+
+    .submit-btn {
+        padding: 12px 35px;
+        border: none;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        font-weight: 700;
+        font-size: 1.05rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+        margin-top: 15px;
+    }
+
+    .submit-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+    }
+
+    .login-prompt {
+        background: linear-gradient(135deg, #e6fffa 0%, #b2f5ea 100%);
+        border-left: 4px solid #38b2ac;
+        padding: 20px 25px;
+        border-radius: 15px;
+        margin-bottom: 30px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .login-prompt i {
+        font-size: 1.5rem;
+        color: #38b2ac;
+    }
+
+    .login-prompt-text {
+        color: #234e52;
+        font-size: 1.05rem;
+        font-weight: 500;
+        margin: 0;
+    }
+
+    .login-prompt a {
+        color: #38b2ac;
+        font-weight: 700;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+    .login-prompt a:hover {
+        color: #2c7a7b;
+        text-decoration: underline;
+    }
+
+    .comments-list {
+        margin-top: 30px;
+    }
+
+    .comment-item {
+        background: white;
+        border: 2px solid #e2e8f0;
+        border-radius: 18px;
+        padding: 25px;
+        margin-bottom: 20px;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .comment-item::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+        transform: scaleY(0);
+        transition: transform 0.3s ease;
+    }
+
+    .comment-item:hover {
+        border-color: #667eea;
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.15);
+        transform: translateX(5px);
+    }
+
+    .comment-item:hover::before {
+        transform: scaleY(1);
+    }
+
+    .comment-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+
+    .comment-author {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .author-avatar {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 700;
+        font-size: 1.1rem;
+    }
+
+    .author-name {
+        font-weight: 700;
+        color: #2d3748;
+        font-size: 1.1rem;
+    }
+
+    .comment-date {
+        color: #718096;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .comment-date i {
+        font-size: 0.85rem;
+    }
+
+    .comment-body {
+        color: #4a5568;
+        font-size: 1.05rem;
+        line-height: 1.7;
+        margin: 0;
+        font-weight: 500;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+    }
+
+    .empty-icon {
+        width: 100px;
+        height: 100px;
+        margin: 0 auto 25px;
+        background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .empty-icon i {
+        font-size: 3rem;
+        color: #cbd5e0;
+    }
+
+    .empty-text {
+        color: #718096;
+        font-size: 1.1rem;
+        margin: 0;
+    }
+
+    .empty-subtext {
+        color: #a0aec0;
+        font-size: 0.95rem;
+        margin-top: 10px;
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .comments-card {
+            padding: 25px 20px;
+        }
+
+        .comments-title {
+            font-size: 1.5rem;
+        }
+
+        .comment-form {
+            padding: 20px;
+        }
+
+        .comment-item {
+            padding: 18px;
+        }
+
+        .comment-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+        }
+    }
+</style>
+
+<div class="comments-card">
+    <div class="comments-header">
+        <i class="fas fa-comments"></i>
+        <h4 class="comments-title">Mijozlar Fikrlari</h4>
+    </div>
+
+    {% if user.is_authenticated %}
+        <form method="post" action="" class="comment-form" id="commentForm">
+            {% csrf_token %}
+            <label class="form-label">
+                <i class="fas fa-pen"></i>
+                Fikringizni bildiring
+            </label>
+            <textarea 
+                name="body" 
+                class="comment-textarea" 
+                rows="4"
+                placeholder="Bu mahsulot haqida fikringizni yozing..." 
+                required></textarea>
+            <button type="submit" class="submit-btn">
+                <i class="fas fa-paper-plane me-2"></i>
+                Yuborish
+            </button>
+        </form>
+    {% else %}
+        <div class="login-prompt">
+            <i class="fas fa-info-circle"></i>
+            <p class="login-prompt-text">
+                Fikr bildirish uchun 
+                <a href="{% url 'login' %}">tizimga kiring</a> 
+                yoki 
+                <a href="{% url 'register' %}">ro'yxatdan o'ting</a>
+            </p>
         </div>
+    {% endif %}
+
+    <div class="comments-list">
+        {% for comment in product.comments.all %}
+            <div class="comment-item">
+                <div class="comment-header">
+                    <div class="comment-author">
+                        <div class="author-avatar">
+                            {{ comment.user.username|first|upper }}
+                        </div>
+                        <span class="author-name">{{ comment.user.username }}</span>
+                    </div>
+                    <div class="comment-date">
+                        <i class="far fa-calendar-alt"></i>
+                        {{ comment.created_at|date:"d.m.Y" }}
+                    </div>
+                </div>
+                <p class="comment-body">{{ comment.body }}</p>
+            </div>
+        {% empty %}
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <i class="far fa-comment-dots"></i>
+                </div>
+                <p class="empty-text">Hozircha izohlar yo'q</p>
+                <p class="empty-subtext">Birinchi bo'lib fikr bildiring!</p>
+            </div>
+        {% endfor %}
     </div>
 </div>
+
+<script>
+    // Textarea auto-resize
+    const textarea = document.querySelector('.comment-textarea');
+    if (textarea) {
+        textarea.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+        });
+    }
+
+    // Form submit animation
+    const form = document.getElementById('commentForm');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            const btn = this.querySelector('.submit-btn');
+            const originalContent = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Yuklanmoqda...';
+            
+            setTimeout(() => {
+                if (btn.disabled) {
+                    btn.disabled = false;
+                    btn.innerHTML = originalContent;
+                }
+            }, 5000);
+        });
+    }
+</script>

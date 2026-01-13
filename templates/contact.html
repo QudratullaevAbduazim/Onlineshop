@@ -1,39 +1,451 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-10">
-        <div class="row g-5">
-            <div class="col-md-6">
-                <h2 class="fw-bold mb-4">Biz bilan bog'laning</h2>
-                <p class="text-muted">Savollaringiz yoki takliflaringiz bo'lsa, quyidagi shaklni to'ldiring yoki bizga qo'ng'iroq qiling.</p>
-                
-                <div class="mt-4">
-                    <p><strong>Manzil:</strong> Toshkent sh., Chilonzor tumani, 10-kvartal</p>
-                    <p><strong>Telefon:</strong> +998 90 123 45 67</p>
-                    <p><strong>Email:</strong> info@onlineshop.uz</p>
+<style>
+    .contact-container {
+        min-height: 80vh;
+        padding: 60px 20px;
+    }
+
+    .contact-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 50px;
+        max-width: 1200px;
+        margin: 0 auto;
+        animation: fadeInUp 0.6s ease;
+    }
+
+    .contact-info {
+        padding: 40px 0;
+    }
+
+    .contact-header {
+        margin-bottom: 30px;
+    }
+
+    .contact-title {
+        font-size: 2.5rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 20px;
+    }
+
+    .contact-subtitle {
+        font-size: 1.15rem;
+        color: #4a5568;
+        line-height: 1.7;
+        font-weight: 500;
+    }
+
+    .info-cards {
+        margin-top: 40px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .info-card {
+        background: white;
+        border-radius: 18px;
+        padding: 25px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+    }
+
+    .info-card:hover {
+        transform: translateX(10px);
+        box-shadow: 0 8px 30px rgba(102, 126, 234, 0.2);
+        border-color: #667eea;
+    }
+
+    .info-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 15px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .info-card:nth-child(2) .info-icon {
+        background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+        box-shadow: 0 5px 15px rgba(72, 187, 120, 0.3);
+    }
+
+    .info-card:nth-child(3) .info-icon {
+        background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+        box-shadow: 0 5px 15px rgba(66, 153, 225, 0.3);
+    }
+
+    .info-icon i {
+        font-size: 1.6rem;
+        color: white;
+    }
+
+    .info-content {
+        flex: 1;
+    }
+
+    .info-label {
+        font-weight: 700;
+        color: #2d3748;
+        font-size: 1.05rem;
+        margin-bottom: 5px;
+    }
+
+    .info-value {
+        color: #4a5568;
+        font-size: 1rem;
+        font-weight: 500;
+        word-break: break-word;
+    }
+
+    .contact-form-card {
+        background: white;
+        border-radius: 25px;
+        padding: 45px;
+        box-shadow: 0 15px 50px rgba(0, 0, 0, 0.15);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .contact-form-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 5px;
+        background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #48bb78 100%);
+    }
+
+    .form-header {
+        text-align: center;
+        margin-bottom: 35px;
+    }
+
+    .form-icon {
+        width: 70px;
+        height: 70px;
+        margin: 0 auto 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+    }
+
+    .form-icon i {
+        font-size: 2rem;
+        color: white;
+    }
+
+    .form-title {
+        font-size: 1.6rem;
+        font-weight: 700;
+        color: #2d3748;
+        margin: 0;
+    }
+
+    .form-group {
+        margin-bottom: 25px;
+    }
+
+    .form-label {
+        display: block;
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 10px;
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .form-label i {
+        color: #667eea;
+        font-size: 0.95rem;
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 15px 20px;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: #f7fafc;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .form-input:focus {
+        outline: none;
+        border-color: #667eea;
+        background: white;
+        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    }
+
+    .form-textarea {
+        resize: vertical;
+        min-height: 130px;
+    }
+
+    .submit-btn {
+        width: 100%;
+        padding: 16px;
+        border: none;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        font-weight: 700;
+        font-size: 1.1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        margin-top: 10px;
+    }
+
+    .submit-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 35px rgba(102, 126, 234, 0.6);
+    }
+
+    .submit-btn:active {
+        transform: translateY(-1px);
+    }
+
+    .success-message {
+        display: none;
+        background: linear-gradient(135deg, #c6f6d5 0%, #9ae6b4 100%);
+        border-left: 4px solid #48bb78;
+        padding: 20px;
+        border-radius: 12px;
+        margin-top: 20px;
+        animation: slideInUp 0.5s ease;
+    }
+
+    .success-message.show {
+        display: block;
+    }
+
+    .success-message i {
+        color: #22543d;
+        font-size: 1.3rem;
+        margin-right: 12px;
+    }
+
+    .success-message p {
+        color: #22543d;
+        font-weight: 600;
+        margin: 0;
+        display: flex;
+        align-items: center;
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes slideInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @media (max-width: 992px) {
+        .contact-grid {
+            grid-template-columns: 1fr;
+            gap: 40px;
+        }
+
+        .contact-info {
+            padding: 20px 0;
+        }
+
+        .contact-title {
+            font-size: 2rem;
+        }
+
+        .contact-form-card {
+            padding: 30px 25px;
+        }
+    }
+</style>
+
+<div class="contact-container">
+    <div class="container">
+        <div class="contact-grid">
+            
+            <!-- CONTACT INFO -->
+            <div class="contact-info">
+                <div class="contact-header">
+                    <h2 class="contact-title">Biz bilan bog'laning</h2>
+                    <p class="contact-subtitle">
+                        Savollaringiz yoki takliflaringiz bo'lsa, quyidagi shaklni to'ldiring 
+                        yoki bizga to'g'ridan-to'g'ri murojaat qiling. Biz sizga yordam berishdan xursandmiz!
+                    </p>
+                </div>
+
+                <div class="info-cards">
+                    <div class="info-card">
+                        <div class="info-icon">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div class="info-content">
+                            <div class="info-label">Manzil</div>
+                            <div class="info-value">Toshkent sh., Chilonzor tumani, 10-kvartal</div>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="info-icon">
+                            <i class="fas fa-phone-alt"></i>
+                        </div>
+                        <div class="info-content">
+                            <div class="info-label">Telefon</div>
+                            <div class="info-value">+998 90 123 45 67</div>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="info-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div class="info-content">
+                            <div class="info-label">Email</div>
+                            <div class="info-value">info@onlineshop.uz</div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="col-md-6">
-                <div class="card shadow-sm p-4">
-                    <form>
-                        <div class="mb-3">
-                            <label class="form-label">Ismingiz</label>
-                            <input type="text" class="form-control" placeholder="Ismingizni yozing">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Email</label>
-                            <input type="email" class="form-control" placeholder="Emailingizni yozing">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Xabar</label>
-                            <textarea class="form-control" rows="4" placeholder="Xabaringizni yozing"></textarea>
-                        </div>
-                        <button type="button" class="btn btn-dark w-100">Yuborish</button>
-                    </form>
+
+            <!-- CONTACT FORM -->
+            <div class="contact-form-card">
+                <div class="form-header">
+                    <div class="form-icon">
+                        <i class="fas fa-paper-plane"></i>
+                    </div>
+                    <h3 class="form-title">Xabar Yuborish</h3>
                 </div>
+
+                <form id="contactForm">
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-user"></i>
+                            Ismingiz
+                        </label>
+                        <input 
+                            type="text" 
+                            class="form-input" 
+                            placeholder="Ismingizni kiriting"
+                            required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-envelope"></i>
+                            Email
+                        </label>
+                        <input 
+                            type="email" 
+                            class="form-input" 
+                            placeholder="Email manzilingizni kiriting"
+                            required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-comment-dots"></i>
+                            Xabar
+                        </label>
+                        <textarea 
+                            class="form-input form-textarea" 
+                            rows="5"
+                            placeholder="Xabaringizni yozing..."
+                            required></textarea>
+                    </div>
+
+                    <button type="submit" class="submit-btn">
+                        <i class="fas fa-paper-plane me-2"></i>
+                        Yuborish
+                    </button>
+
+                    <div class="success-message" id="successMessage">
+                        <p>
+                            <i class="fas fa-check-circle"></i>
+                            Xabaringiz muvaffaqiyatli yuborildi! Tez orada siz bilan bog'lanamiz.
+                        </p>
+                    </div>
+                </form>
             </div>
+
         </div>
     </div>
 </div>
+
+<script>
+    // Form submission
+    document.getElementById('contactForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const btn = this.querySelector('.submit-btn');
+        const successMsg = document.getElementById('successMessage');
+        const originalContent = btn.innerHTML;
+        
+        // Show loading
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Yuborilmoqda...';
+        
+        // Simulate form submission
+        setTimeout(() => {
+            // Show success message
+            successMsg.classList.add('show');
+            btn.innerHTML = '<i class="fas fa-check me-2"></i> Yuborildi!';
+            
+            // Reset form
+            this.reset();
+            
+            // Reset button after 3 seconds
+            setTimeout(() => {
+                btn.disabled = false;
+                btn.innerHTML = originalContent;
+                successMsg.classList.remove('show');
+            }, 3000);
+        }, 1500);
+    });
+
+    // Auto-resize textarea
+    const textarea = document.querySelector('.form-textarea');
+    if (textarea) {
+        textarea.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+        });
+    }
+</script>
+
 {% endblock %}

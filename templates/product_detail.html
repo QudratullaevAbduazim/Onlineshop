@@ -1,62 +1,144 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<nav aria-label="breadcrumb">
-  <ol class="breadcrumb">
-    <li class="breadcrumb-item"><a href="{% url 'index' %}">Bosh sahifa</a></li>
-    <li class="breadcrumb-item active">{{ product.category.name }}</li>
-  </ol>
-</nav>
+<div class="container py-5 animate__animated animate__fadeIn">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb bg-transparent p-0">
+            <li class="breadcrumb-item"><a href="{% url 'index' %}" class="text-decoration-none text-primary">Bosh sahifa</a></li>
+            <li class="breadcrumb-item active text-muted" aria-current="page">{{ product.category.name }}</li>
+        </ol>
+    </nav>
 
-<div class="row mt-4">
-    <div class="col-md-6">
-        {% if product.image %}
-            <img src="{{ product.image.url }}" class="img-fluid rounded shadow" alt="{{ product.name }}">
-        {% else %}
-            <div class="bg-light text-center py-5 rounded">Rasm yuklanmagan</div>
-        {% endif %}
-    </div>
-    
-    <div class="col-md-6">
-        <div class="ps-md-4">
-            <h1 class="display-5 fw-bold">{{ product.name }}</h1>
-            <p class="text-muted small">Kategoriya: {{ product.category.name }}</p>
-            <h2 class="text-success my-4">{{ product.price }} so'm</h2>
-            
-            <div class="mb-4">
-                <h5>Ma'lumot:</h5>
-                <p class="lead text-secondary">{{ product.description }}</p>
-            </div>
-
-            <div class="d-flex gap-3">
-                <form action="{% url 'add_to_cart' product.id %}" method="post" class="flex-grow-1">
-                    {% csrf_token %}
-                    <div class="input-group mb-3">
-                        <input type="number" name="quantity" value="1" min="1" max="{{ product.quantity }}" class="form-control" style="max-width: 80px;">
-                        <button class="btn btn-primary btn-lg px-4" type="submit">
-                            <i class="fas fa-cart-plus me-2"></i> Savatchaga qo'shish
-                        </button>
+    <div class="row g-5">
+        <div class="col-md-6">
+            <div class="product-detail-img-container shadow-lg rounded-4 overflow-hidden bg-white p-3">
+                {% if product.image %}
+                    <img src="{{ product.image.url }}" class="img-fluid w-100 rounded-3 main-product-img" alt="{{ product.name }}">
+                {% else %}
+                    <div class="no-img-placeholder py-5 text-center">
+                        <i class="fas fa-image fa-5x opacity-25"></i>
+                        <p class="mt-3">Rasm mavjud emas</p>
                     </div>
-                </form>
+                {% endif %}
             </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="product-info-card p-2">
+                <span class="badge bg-soft-primary text-primary px-3 py-2 rounded-pill mb-3">
+                    <i class="fas fa-tag me-1"></i> {{ product.category.name }}
+                </span>
+                
+                <h1 class="display-5 fw-bold mb-3">{{ product.name }}</h1>
+                
+                <div class="price-section mb-4">
+                    <h2 class="text-success fw-bold display-6">{{ product.price }} so'm</h2>
+                    <p class="text-muted small">Omborda: {{ product.quantity }} dona mavjud</p>
+                </div>
+                
+                <div class="description-section mb-5 p-4 rounded-4 bg-light-custom">
+                    <h5 class="fw-bold mb-3 text-dark"><i class="fas fa-info-circle me-2"></i>Mahsulot tavsifi</h5>
+                    <p class="lead text-secondary fs-6">{{ product.description }}</p>
+                </div>
 
-            {% if user.is_staff %}
-            <div class="mt-3">
-                <hr>
-                <p class="text-danger small">Admin amallari:</p>
-                <a href="{% url 'product_update' product.id %}" class="btn btn-sm btn-warning">Tahrirlash</a>
-                <a href="{% url 'product_delete' product.id %}" class="btn btn-sm btn-danger">O'chirish</a>
+                <div class="purchase-action-box p-4 rounded-4 shadow-sm border border-light">
+                    <form action="{% url 'add_to_cart' product.id %}" method="post">
+                        {% csrf_token %}
+                        <div class="row g-3 align-items-center">
+                            <div class="col-4 col-lg-3">
+                                <label class="small fw-bold mb-1 d-block">Soni:</label>
+                                <input type="number" name="quantity" value="1" min="1" max="{{ product.quantity }}" 
+                                       class="form-control form-control-lg rounded-3 shadow-none border-2">
+                            </div>
+                            <div class="col-8 col-lg-9">
+                                <label class="d-none d-lg-block mb-1">&nbsp;</label>
+                                <button class="btn btn-primary btn-lg w-100 rounded-pill fw-bold shadow transition-hover py-3" type="submit">
+                                    <i class="fas fa-shopping-basket me-2"></i> Savatchaga qo'shish
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                {% if user.is_staff %}
+                <div class="admin-actions mt-5 p-3 rounded-4 border border-danger border-dashed d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="badge bg-danger mb-1">Admin Panel</span>
+                        <p class="m-0 small text-muted">Mahsulotni boshqarish</p>
+                    </div>
+                    <div class="btn-group">
+                        <a href="{% url 'product_update' product.id %}" class="btn btn-outline-warning rounded-pill px-4 me-2">
+                            <i class="fas fa-edit me-1"></i> Tahrirlash
+                        </a>
+                        <a href="{% url 'product_delete' product.id %}" class="btn btn-outline-danger rounded-pill px-4">
+                            <i class="fas fa-trash-alt me-1"></i> O'chirish
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
             </div>
-            {% endif %}
+        </div>
+    </div>
+
+    <div class="row mt-5 pt-5">
+        <div class="col-lg-8">
+            <div class="comments-wrapper rounded-4 p-4 p-lg-5 shadow-sm bg-white-custom">
+                <h3 class="fw-bold mb-4 d-flex align-items-center">
+                    <i class="fas fa-comments me-3 text-primary"></i>Mijozlar fikri
+                </h3>
+                <hr class="mb-5 opacity-25">
+                {% include 'comment_section.html' %}
+            </div>
         </div>
     </div>
 </div>
 
-<hr class="my-5">
-<div class="row">
-    <div class="col-md-8">
-        <h3>Mijozlar fikri</h3>
-        {% include 'comment_section.html' %}
-    </div>
-</div>
+<style>
+    /* 1. Umumiy elementlar */
+    .bg-soft-primary { background-color: rgba(111, 66, 193, 0.1); }
+    .bg-light-custom { background-color: #f8f9fa; }
+    .border-dashed { border-style: dashed !important; }
+
+    /* 2. Rasm dizayni */
+    .product-detail-img-container {
+        position: sticky;
+        top: 100px;
+        transition: transform 0.3s ease;
+    }
+    .main-product-img {
+        object-fit: contain;
+        max-height: 500px;
+    }
+
+    /* 3. Input va Button */
+    .purchase-action-box { background-color: white; }
+    .transition-hover:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(111, 66, 193, 0.2) !important;
+    }
+
+    /* 4. DARK MODE MOSLASHUVI */
+    body.dark-mode .product-detail-img-container,
+    body.dark-mode .bg-white-custom,
+    body.dark-mode .purchase-action-box {
+        background-color: #1e1e1e !important;
+        border-color: #333 !important;
+    }
+    body.dark-mode .bg-light-custom {
+        background-color: #2d2d2d !important;
+    }
+    body.dark-mode .text-dark,
+    body.dark-mode h1,
+    body.dark-mode h3 {
+        color: #fff !important;
+    }
+    body.dark-mode .description-section p {
+        color: #ccc !important;
+    }
+    body.dark-mode .form-control {
+        background-color: #2d2d2d;
+        border-color: #444;
+        color: white;
+    }
+</style>
 {% endblock %}

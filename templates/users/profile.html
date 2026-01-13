@@ -1,141 +1,580 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container mt-4">
-    <div class="row">
-        <!-- PROFIL MA'LUMOTLARI -->
-        <div class="col-md-6 mb-4">
-            <div class="card shadow-sm border-0">
-                <div class="card-header bg-dark text-white">
-                    <h5 class="mb-0">Profil ma'lumotlari</h5>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    .profile-container {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 20px;
+    }
+
+    .profile-wrapper {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .page-header {
+        text-align: center;
+        color: white;
+        margin-bottom: 30px;
+        animation: fadeInDown 0.6s ease;
+    }
+
+    .page-header h1 {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .cards-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+        gap: 25px;
+        margin-bottom: 30px;
+    }
+
+    .profile-card {
+        background: white;
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        animation: fadeInUp 0.6s ease;
+    }
+
+    .profile-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+    }
+
+    .card-header {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        border-bottom: 3px solid #667eea;
+    }
+
+    .card-header i {
+        font-size: 1.8rem;
+        color: #667eea;
+    }
+
+    .card-header h2 {
+        font-size: 1.5rem;
+        color: #2d3748;
+    }
+
+    .profile-image-section {
+        text-align: center;
+        margin-bottom: 25px;
+    }
+
+    .profile-avatar {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        border: 5px solid #667eea;
+        object-fit: cover;
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        transition: transform 0.3s ease;
+    }
+
+    .profile-avatar:hover {
+        transform: scale(1.05);
+    }
+
+    .avatar-placeholder {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 4rem;
+        color: white;
+        border: 5px solid #667eea;
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .input-group {
+        margin-bottom: 20px;
+    }
+
+    .input-label {
+        display: block;
+        font-weight: 600;
+        color: #4a5568;
+        margin-bottom: 8px;
+        font-size: 0.95rem;
+    }
+
+    .input-field {
+        width: 100%;
+        padding: 12px 15px;
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: #f7fafc;
+    }
+
+    .input-field:focus {
+        outline: none;
+        border-color: #667eea;
+        background: white;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .submit-btn {
+        width: 100%;
+        padding: 14px;
+        border: none;
+        border-radius: 10px;
+        font-size: 1.05rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: white;
+    }
+
+    .btn-success {
+        background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+        box-shadow: 0 4px 15px rgba(72, 187, 120, 0.4);
+    }
+
+    .btn-success:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(72, 187, 120, 0.6);
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+    }
+
+    .products-section {
+        animation: fadeInUp 0.8s ease;
+    }
+
+    .products-card {
+        background: white;
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    .products-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        border-bottom: 3px solid #48bb78;
+    }
+
+    .products-title {
+        font-size: 1.8rem;
+        color: #2d3748;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .products-title i {
+        color: #48bb78;
+        font-size: 2rem;
+    }
+
+    .add-product-btn {
+        padding: 12px 25px;
+        background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3);
+    }
+
+    .add-product-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(72, 187, 120, 0.5);
+        color: white;
+    }
+
+    .products-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0 10px;
+    }
+
+    .products-table thead th {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 15px;
+        text-align: left;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.9rem;
+        letter-spacing: 0.5px;
+    }
+
+    .products-table thead th:first-child {
+        border-radius: 10px 0 0 10px;
+    }
+
+    .products-table thead th:last-child {
+        border-radius: 0 10px 10px 0;
+    }
+
+    .products-table tbody tr {
+        background: #f7fafc;
+        transition: all 0.3s ease;
+    }
+
+    .products-table tbody tr:hover {
+        background: #edf2f7;
+        transform: scale(1.01);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .products-table tbody td {
+        padding: 15px;
+        border-top: 1px solid #e2e8f0;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .products-table tbody td:first-child {
+        border-left: 1px solid #e2e8f0;
+        border-radius: 10px 0 0 10px;
+        font-weight: 600;
+        color: #667eea;
+    }
+
+    .products-table tbody td:last-child {
+        border-right: 1px solid #e2e8f0;
+        border-radius: 0 10px 10px 0;
+    }
+
+    .status-badge {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .badge-active {
+        background: #c6f6d5;
+        color: #22543d;
+    }
+
+    .badge-inactive {
+        background: #e2e8f0;
+        color: #4a5568;
+    }
+
+    .action-btns {
+        display: flex;
+        gap: 8px;
+        justify-content: flex-end;
+    }
+
+    .action-btn {
+        padding: 8px 15px;
+        border: none;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        color: white;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .btn-view {
+        background: #4299e1;
+    }
+
+    .btn-view:hover {
+        background: #3182ce;
+        transform: translateY(-2px);
+        color: white;
+    }
+
+    .btn-edit {
+        background: #ed8936;
+    }
+
+    .btn-edit:hover {
+        background: #dd6b20;
+        transform: translateY(-2px);
+        color: white;
+    }
+
+    .btn-delete {
+        background: #f56565;
+    }
+
+    .btn-delete:hover {
+        background: #e53e3e;
+        transform: translateY(-2px);
+        color: white;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #718096;
+    }
+
+    .empty-state i {
+        font-size: 5rem;
+        color: #cbd5e0;
+        margin-bottom: 20px;
+    }
+
+    .empty-state p {
+        font-size: 1.2rem;
+    }
+
+    .error-text {
+        color: #e53e3e;
+        font-size: 0.85rem;
+        margin-top: 5px;
+    }
+
+    @keyframes fadeInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .cards-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .products-header {
+            flex-direction: column;
+            gap: 15px;
+            align-items: flex-start;
+        }
+
+        .action-btns {
+            flex-direction: column;
+            width: 100%;
+        }
+
+        .action-btn {
+            width: 100%;
+        }
+
+        .products-table {
+            font-size: 0.9rem;
+        }
+    }
+</style>
+
+<div class="profile-container">
+    <div class="profile-wrapper">
+        <div class="page-header">
+            <h1><i class="fas fa-user-circle"></i> Profil Sahifasi</h1>
+            <p>Shaxsiy ma'lumotlaringizni boshqaring</p>
+        </div>
+
+        <!-- Django Messages -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}" style="margin-bottom: 20px; padding: 15px; border-radius: 10px; background: {% if message.tags == 'success' %}#c6f6d5{% elif message.tags == 'error' %}#fed7d7{% else %}#bee3f8{% endif %}; color: {% if message.tags == 'success' %}#22543d{% elif message.tags == 'error' %}#742a2a{% else %}#2c5282{% endif %};">
+                    {{ message }}
                 </div>
-                <div class="card-body">
-                    <div class="text-center mb-4">
-                        {% if user.profile.image %}
-                            <img src="{{ user.profile.image.url }}"
-                                 class="rounded-circle border"
-                                 style="width: 120px; height: 120px; object-fit: cover;">
-                        {% else %}
-                            <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center border"
-                                 style="width: 120px; height: 120px;">
-                                <i class="fas fa-user fa-3x text-secondary"></i>
-                            </div>
-                        {% endif %}
+            {% endfor %}
+        {% endif %}
+
+        <div class="cards-grid">
+            <!-- PROFIL MA'LUMOTLARI -->
+            <div class="profile-card">
+                <div class="card-header">
+                    <i class="fas fa-id-card"></i>
+                    <h2>Profil Ma'lumotlari</h2>
+                </div>
+
+                <div class="profile-image-section">
+                    {% if user.profile.image %}
+                        <img src="{{ user.profile.image.url }}" class="profile-avatar" alt="Profile">
+                    {% else %}
+                        <div class="avatar-placeholder">
+                            <i class="fas fa-user"></i>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="input-group">
+                        <label class="input-label">Foydalanuvchi nomi</label>
+                        {{ user_form.username }}
                     </div>
+                    <div class="input-group">
+                        <label class="input-label">Email</label>
+                        {{ user_form.email }}
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Telefon raqami</label>
+                        {{ profile_form.phone_number }}
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Profil rasmi</label>
+                        {{ profile_form.image }}
+                    </div>
+                    <button type="submit" name="update_profile" class="submit-btn btn-success">
+                        <i class="fas fa-save"></i> Profilni Saqlash
+                    </button>
+                </form>
+            </div>
 
-                    <form method="POST" enctype="multipart/form-data">
-                        {% csrf_token %}
-                        <div class="mb-3">
-                            <label class="form-label small fw-bold">Foydalanuvchi nomi</label>
-                            {{ user_form.username }}
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label small fw-bold">Email</label>
-                            {{ user_form.email }}
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label small fw-bold">Profil rasmi</label>
-                            {{ profile_form.image }}
-                        </div>
-                        <div class="d-grid">
-                            <button type="submit" name="update_profile" class="btn btn-dark">
-                                Profilni saqlash
-                            </button>
-                        </div>
-                    </form>
+            <!-- PAROL O'ZGARTIRISH -->
+            <div class="profile-card">
+                <div class="card-header">
+                    <i class="fas fa-lock"></i>
+                    <h2>Parolni O'zgartirish</h2>
                 </div>
+
+                <form method="POST">
+                    {% csrf_token %}
+                    {% for field in password_form %}
+                        <div class="input-group">
+                            <label class="input-label">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.errors %}
+                                <div class="error-text">{{ field.errors }}</div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                    <button type="submit" name="update_password" class="submit-btn btn-primary">
+                        <i class="fas fa-key"></i> Parolni Yangilash
+                    </button>
+                </form>
             </div>
         </div>
 
-        <!-- PAROL O‘ZGARTIRISH -->
-        <div class="col-md-6 mb-4">
-            <div class="card shadow-sm border-0">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Parolni o'zgartirish</h5>
-                </div>
-                <div class="card-body">
-                    <form method="POST">
-                        {% csrf_token %}
-                        {% for field in password_form %}
-                            <div class="mb-3">
-                                <label class="form-label small fw-bold">{{ field.label }}</label>
-                                {{ field }}
-                                {% if field.errors %}
-                                    <div class="text-danger small">{{ field.errors }}</div>
-                                {% endif %}
-                            </div>
-                        {% endfor %}
-                        <div class="d-grid">
-                            <button type="submit" name="update_password" class="btn btn-primary">
-                                Parolni yangilash
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 🔥 ADMIN / USER QO‘SHGAN MAHSULOTLAR -->
-    <div class="row mt-4">
-        <div class="col-12">
-            <div class="card shadow-sm border-0">
-                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">Mening mahsulotlarim</h5>
-                    <a href="{% url 'product_add' %}" class="btn btn-light btn-sm">
-                        + Mahsulot qo‘shish
+        <!-- MAHSULOTLAR JADVALI -->
+        <div class="products-section">
+            <div class="products-card">
+                <div class="products-header">
+                    <h2 class="products-title">
+                        <i class="fas fa-box"></i>
+                        Mening Mahsulotlarim
+                    </h2>
+                    <a href="{% url 'product_add' %}" class="add-product-btn">
+                        <i class="fas fa-plus"></i>
+                        Mahsulot Qo'shish
                     </a>
                 </div>
 
-                <div class="card-body">
-                    {% if products %}
-                        <div class="table-responsive">
-                            <table class="table table-hover align-middle">
-                                <thead>
-                                    <tr>
-                                        <th>#</th>
-                                        <th>Nomi</th>
-                                        <th>Narxi</th>
-                                        <th>Holati</th>
-                                        <th class="text-end">Amallar</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for product in products %}
-                                    <tr>
-                                        <td>{{ forloop.counter }}</td>
-                                        <td>{{ product.name }}</td>
-                                        <td>{{ product.price }}</td>
-                                        <td>
-                                            {% if product.is_active %}
-                                                <span class="badge bg-success">Faol</span>
-                                            {% else %}
-                                                <span class="badge bg-secondary">Noaktiv</span>
-                                            {% endif %}
-                                        </td>
-                                        <td class="text-end">
-                                            <a href="{% url 'product_detail' product.pk %}" class="btn btn-sm btn-info">
-                                                Ko‘rish
-                                            </a>
-                                            <a href="{% url 'product_update' product.pk %}" class="btn btn-sm btn-warning">
-                                                Tahrirlash
-                                            </a>
-                                            <a href="{% url 'product_delete' product.pk %}" class="btn btn-sm btn-danger">
-                                                O‘chirish
-                                            </a>
-                                        </td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                    {% else %}
-                        <p class="text-muted mb-0">Hozircha mahsulot qo‘shilmagan.</p>
-                    {% endif %}
-                </div>
+                {% if products %}
+                    <table class="products-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Nomi</th>
+                                <th>Narxi</th>
+                                <th>Holati</th>
+                                <th style="text-align: right;">Amallar</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for product in products %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ product.name }}</td>
+                                <td>{{ product.price }} so'm</td>
+                                <td>
+                                    {% if product.is_active %}
+                                        <span class="status-badge badge-active">Faol</span>
+                                    {% else %}
+                                        <span class="status-badge badge-inactive">Noaktiv</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="action-btns">
+                                        <a href="{% url 'product_detail' product.pk %}" class="action-btn btn-view">
+                                            <i class="fas fa-eye"></i> Ko'rish
+                                        </a>
+                                        <a href="{% url 'product_update' product.pk %}" class="action-btn btn-edit">
+                                            <i class="fas fa-edit"></i> Tahrirlash
+                                        </a>
+                                        <a href="{% url 'product_delete' product.pk %}" class="action-btn btn-delete" onclick="return confirm('Mahsulotni o\'chirmoqchimisiz?')">
+                                            <i class="fas fa-trash"></i> O'chirish
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <p>Hozircha mahsulot qo'shilmagan.</p>
+                    </div>
+                {% endif %}
             </div>
         </div>
-    </div>
 
+    </div>
 </div>
+
+<script>
+    // Form inputlarini stillashtirish
+    document.addEventListener('DOMContentLoaded', function() {
+        const inputs = document.querySelectorAll('input[type="text"], input[type="email"], input[type="password"], input[type="file"]');
+        inputs.forEach(input => {
+            input.classList.add('input-field');
+        });
+    });
+</script>
+
 {% endblock %}

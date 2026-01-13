@@ -3,141 +3,260 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}N72 Online Shop{% endblock %}</title>
+    <title>{% block title %}N72 Online Shop | Sifatli Xaridlar Markazi{% endblock %}</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
 
     <style>
-        body { background-color: #f4f6f9; min-height: 100vh; display: flex; flex-direction: column; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        .navbar-brand { font-weight: 800; letter-spacing: 1px; }
-        .wallet-balance { background: #e9f7ef; padding: 5px 15px; border-radius: 50px; color: #198754; font-weight: bold; border: 1px solid #198754; }
-        .main-container { flex: 1; }
-        footer { background: #212529; color: white; padding: 40px 0; margin-top: 50px; }
-        .nav-link { position: relative; font-weight: 500; }
-        .cart-badge { position: absolute; top: -5px; right: -8px; font-size: 0.7rem; padding: 0.35em 0.65em; }
+        /* ========================================
+        1. UMUMIY ASOSIY STILLAR (GLOBAL)
+        ======================================== */
+        :root {
+            --primary-bg: #5d48b9; 
+            --navbar-white: rgba(255, 255, 255, 0.98);
+            --transition-smooth: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            --accent-gold: #fbbf24;
+        }
 
-        /* Admin uchun maxsus uslublar */
-        .admin-link { color: #ffc107 !important; border: 1px border #ffc107; border-radius: 8px; margin-left: 5px; }
-        .admin-link:hover { background: rgba(255, 193, 7, 0.1); }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        /* Alert animatsiyasi */
-        .alert { border: none; border-radius: 12px; }
+        body {
+            background-color: var(--primary-bg) !important;
+            background-image: radial-gradient(circle at 20% 30%, rgba(118, 75, 162, 0.4) 0%, transparent 50%),
+                              radial-gradient(circle at 80% 70%, rgba(102, 126, 234, 0.3) 0%, transparent 50%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            font-family: 'Segoe UI', sans-serif;
+            overflow-x: hidden;
+            color: #2d3436;
+            transition: background-color 0.5s ease;
+        }
+
+        /* ========================================
+        2. DARK MODE STILLARI (TEKSHIRILGAN)
+        ======================================== */
+        body.dark-mode {
+            background-color: #121212 !important;
+            background-image: none !important;
+            color: #e0e0e0 !important;
+        }
+
+        body.dark-mode .navbar-custom {
+            background: #1e1e1e !important;
+            border-bottom: 1px solid #333;
+        }
+
+        body.dark-mode .nav-link { color: #bbb !important; }
+        body.dark-mode .navbar-brand { color: #bb86fc !important; }
+        body.dark-mode footer { background: #000 !important; }
+
+        /* Mode Knopkasi */
+        .theme-toggle-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            background: rgba(93, 72, 185, 0.1);
+            color: var(--primary-bg);
+            margin-right: 15px;
+        }
+
+        body.dark-mode .theme-toggle-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffb74d;
+        }
+
+        /* ========================================
+        3. NAVIGATION BAR
+        ======================================== */
+        .navbar-custom {
+            background: var(--navbar-white) !important;
+            backdrop-filter: blur(15px);
+            padding: 15px 0;
+            transition: var(--transition-smooth);
+            z-index: 1050;
+        }
+
+        .navbar-brand {
+            font-weight: 800;
+            font-size: 1.6rem;
+            color: var(--primary-bg) !important;
+        }
+
+        .nav-link {
+            font-weight: 600;
+            color: #4a5568 !important;
+            padding: 8px 15px !important;
+            border-radius: 8px;
+            transition: var(--transition-smooth);
+        }
+
+        .nav-link:hover { background: rgba(93, 72, 185, 0.08); }
+
+        /* ========================================
+        4. HAMYON VA SAVATCHA
+        ======================================== */
+        .wallet-balance {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white !important;
+            padding: 10px 22px;
+            border-radius: 50px;
+            font-weight: 700;
+            text-decoration: none;
+            box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3);
+        }
+
+        .cart-wrapper { position: relative; padding: 10px; }
+        .cart-icon { font-size: 1.5rem; color: var(--primary-bg); }
+        .cart-badge {
+            background: #f56565 !important;
+            position: absolute;
+            top: 2px;
+            right: 0;
+        }
+
+        /* ========================================
+        5. MAIN CONTENT & FOOTER
+        ======================================== */
+        .main-wrapper { flex: 1; padding: 50px 0; }
+
+        footer {
+            background: rgba(26, 32, 44, 0.95);
+            color: #a0aec0;
+            padding: 60px 0 30px;
+            margin-top: auto;
+        }
+
+        .social-circle {
+            width: 40px; height: 40px;
+            background: rgba(255,255,255,0.05);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            color: white;
+            margin-right: 10px;
+        }
     </style>
 </head>
 <body>
 
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow">
+    <nav class="navbar navbar-expand-lg navbar-custom sticky-top">
         <div class="container">
-            <a class="navbar-brand text-uppercase" href="{% url 'index' %}">
-                <i class="fas fa-shopping-bag me-2 text-warning"></i>N72 SHOP
+            <a class="navbar-brand d-flex align-items-center" href="{% url 'index' %}">
+                <i class="fas fa-shopping-bag me-3"></i>
+                <span>N72 SHOP</span>
             </a>
 
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+                <span class="fas fa-bars"></span>
             </button>
 
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
+            <div class="collapse navbar-collapse" id="mainNav">
+                <ul class="navbar-nav me-auto ms-lg-5">
                     <li class="nav-item"><a class="nav-link" href="{% url 'index' %}">Asosiy</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'about' %}">Biz haqimizda</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'contact' %}">Aloqa</a></li>
-
-                    {% if user.is_staff %}
-                    <li class="nav-item dropdown bg-secondary rounded ms-lg-2">
-                        <a class="nav-link dropdown-toggle admin-link" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-tools me-1"></i> Admin Panel
-                        </a>
-                        <ul class="dropdown-menu shadow">
-                            <li><a class="dropdown-item" href="{% url 'product_add' %}"><i class="fas fa-plus-circle me-2"></i>Mahsulot qo'shish</a></li>
-                            <li><a class="dropdown-item" href="/admin/"><i class="fas fa-user-shield me-2"></i>Django Admin</a></li>
-                        </ul>
-                    </li>
-                    {% endif %}
                 </ul>
 
-                <div class="navbar-nav ms-auto align-items-center">
+                <div class="d-flex align-items-center gap-2">
+                    
+                    <button onclick="toggleTheme()" class="theme-toggle-btn" id="theme-btn" title="Rejimni o'zgartirish">
+                        <i class="fas fa-moon" id="theme-icon"></i>
+                    </button>
+
                     {% if user.is_authenticated %}
-                        <a class="nav-link me-3" href="{% url 'wallet_detail' %}">
-                            <span class="wallet-balance small">
-                                <i class="fas fa-wallet me-1"></i> {{ user.wallet.balance|default:"0" }} so'm
-                            </span>
+                        <a href="{% url 'wallet_detail' %}" class="wallet-balance me-2">
+                            <i class="fas fa-wallet me-2"></i>{{ user.wallet.balance|default:"0" }}
                         </a>
-
-                        <a class="nav-link me-3" href="{% url 'cart' %}" title="Savatcha">
-                            <i class="fas fa-shopping-cart fa-lg"></i>
-                            <span class="badge rounded-pill bg-danger cart-badge">
-                                {{ user.cart.items.count|default:0 }}
-                            </span>
+                        <a href="{% url 'cart' %}" class="cart-wrapper me-3">
+                            <i class="fas fa-shopping-cart cart-icon"></i>
+                            <span class="badge rounded-pill cart-badge">{{ user.cart.items.count|default:0 }}</span>
                         </a>
-
-                        <div class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
-                                <i class="fas fa-user-circle fa-lg me-1"></i> {{ user.username }}
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0">
-                                <li><a class="dropdown-item" href="{% url 'profile' %}"><i class="fas fa-cog me-2"></i>Profil sozlamalari</a></li>
+                        <div class="dropdown">
+                            <button class="btn btn-primary dropdown-toggle rounded-pill" data-bs-toggle="dropdown">
+                                {{ user.username }}
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                                <li><a class="dropdown-item" href="{% url 'profile' %}">Profil</a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
-                                    <form action="{% url 'logout' %}" method="post" class="px-2">
+                                    <form action="{% url 'logout' %}" method="post" class="px-3">
                                         {% csrf_token %}
-                                        <button type="submit" class="btn btn-danger btn-sm w-100"><i class="fas fa-sign-out-alt me-1"></i> Chiqish</button>
+                                        <button class="btn btn-sm btn-danger w-100">Chiqish</button>
                                     </form>
                                 </li>
                             </ul>
                         </div>
                     {% else %}
-                        <a class="nav-link" href="{% url 'login' %}">Kirish</a>
-                        <a class="btn btn-warning btn-sm ms-lg-2 rounded-pill px-4 fw-bold shadow-sm" href="{% url 'register' %}">Ro'yxatdan o'tish</a>
+                        <a class="btn btn-outline-primary rounded-pill px-4" href="{% url 'login' %}">Kirish</a>
                     {% endif %}
                 </div>
             </div>
         </div>
     </nav>
 
-    <div class="container main-container py-4">
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show shadow-sm mb-4" role="alert">
-                    <i class="fas {% if message.tags == 'success' %}fa-check-circle{% elif message.tags == 'error' %}fa-exclamation-triangle{% else %}fa-info-circle{% endif %} me-2"></i>
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            {% endfor %}
-        {% endif %}
-
-        {% block content %}{% endblock %}
-    </div>
+    <main class="main-wrapper">
+        <div class="container">
+            {% block content %}{% endblock %}
+        </div>
+    </main>
 
     <footer>
         <div class="container text-center">
-            <div class="row">
-                <div class="col-md-4 mb-4 mb-md-0">
-                    <h5 class="fw-bold mb-3">N72 SHOP</h5>
-                    <p class="small text-secondary">Biz bilan sifatli va ishonchli xaridlar markazida bo'ling. Har bir mahsulot kafolatlangan.</p>
-                </div>
-                <div class="col-md-4 mb-4 mb-md-0">
-                    <h5 class="fw-bold mb-3">Menyular</h5>
-                    <ul class="list-unstyled small">
-                        <li><a href="{% url 'index' %}" class="text-secondary text-decoration-none hover-white">Bosh sahifa</a></li>
-                        <li><a href="{% url 'about' %}" class="text-secondary text-decoration-none">Biz haqimizda</a></li>
-                        <li><a href="{% url 'contact' %}" class="text-secondary text-decoration-none">Aloqa va qo'llab-quvvatlash</a></li>
-                    </ul>
-                </div>
-                <div class="col-md-4">
-                    <h5 class="fw-bold mb-3">Ijtimoiy tarmoqlar</h5>
-                    <div class="fs-4">
-                        <a href="#" class="text-secondary me-3"><i class="fab fa-telegram"></i></a>
-                        <a href="#" class="text-secondary me-3"><i class="fab fa-instagram"></i></a>
-                        <a href="#" class="text-secondary"><i class="fab fa-facebook"></i></a>
-                    </div>
-                </div>
+            <div class="mb-4">
+                <a href="#" class="social-circle"><i class="fab fa-telegram"></i></a>
+                <a href="#" class="social-circle"><i class="fab fa-instagram"></i></a>
             </div>
-            <hr class="bg-secondary opacity-25 mt-4">
-            <p class="small mb-0 text-secondary">&copy; 2024 N72 Online Shop. Barcha huquqlar himoyalangan.</p>
+            <p>&copy; 2026 N72 SHOP. Barcha huquqlar himoyalangan.</p>
         </div>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // DARK MODE LOGIKASI
+        const body = document.body;
+        const themeIcon = document.getElementById('theme-icon');
+
+        // Sahifa yuklanganda holatni tekshirish
+        if (localStorage.getItem('theme') === 'dark') {
+            body.classList.add('dark-mode');
+            themeIcon.classList.replace('fa-moon', 'fa-sun');
+        }
+
+        function toggleTheme() {
+            body.classList.toggle('dark-mode');
+            
+            if (body.classList.contains('dark-mode')) {
+                localStorage.setItem('theme', 'dark');
+                themeIcon.classList.replace('fa-moon', 'fa-sun');
+                themeIcon.style.transform = "rotate(360deg)";
+            } else {
+                localStorage.setItem('theme', 'light');
+                themeIcon.classList.replace('fa-sun', 'fa-moon');
+                themeIcon.style.transform = "rotate(0deg)";
+            }
+        }
+
+        // Navbar scroll effekti
+        window.onscroll = function() {
+            let nav = document.querySelector('.navbar-custom');
+            if (window.pageYOffset > 50) {
+                nav.style.boxShadow = '0 5px 20px rgba(0,0,0,0.1)';
+            } else {
+                nav.style.boxShadow = 'none';
+            }
+        };
+    </script>
 </body>
 </html>

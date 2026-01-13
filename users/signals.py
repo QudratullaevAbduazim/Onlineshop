@@ -10,7 +10,6 @@ def create_profile(sender, instance, created, **kwargs):
 
 @receiver(post_save, sender=User)
 def save_profile(sender, instance, **kwargs):
-    # Agar profil qandaydir sabab bilan o'chib ketgan bo'lsa, xatolik bermasligi uchun
     if hasattr(instance, 'profile'):
         instance.profile.save()
     else:

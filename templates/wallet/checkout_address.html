@@ -3,57 +3,461 @@
 {% block title %}Manzil kiritish - N72 Shop{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card shadow border-0" style="border-radius: 20px;">
-                <div class="card-body p-5">
-                    <div class="text-center mb-4">
-                        <div class="bg-warning bg-opacity-10 d-inline-block p-4 rounded-circle mb-3">
-                            <i class="fas fa-map-marked-alt fa-3x text-warning"></i>
-                        </div>
-                        <h3 class="fw-bold">Yetkazib berish manzili</h3>
-                        <p class="text-muted">Buyurtmani qabul qilish uchun manzilingizni to'liq yozing Toshkent Shahrida yetkazib beramiz</p>
-                    </div>
+<style>
+    .address-container {
+        min-height: 80vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 20px;
+    }
 
-                    <form method="POST">
-                        {% csrf_token %}
-                        <div class="mb-4">
-                            <label class="form-label fw-bold">Manzilni kiriting:</label>
-                            <textarea name="address" class="form-control form-control-lg border-2" rows="4"
-                                      placeholder="Viloyat, tuman, ko'cha nomi va uy raqami..."
-                                      required></textarea>
-                        </div>
+    .address-card {
+        background: white;
+        border-radius: 30px;
+        padding: 50px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        max-width: 700px;
+        width: 100%;
+        animation: fadeInUp 0.6s ease;
+        position: relative;
+        overflow: hidden;
+    }
 
-                        <div class="card bg-light mb-4 border-0">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between align-items-center mb-1">
-                                    <span class="text-muted">Mahsulotlar:</span>
-                                    <span class="fw-bold">{{ cart.items.count }} ta</span>
-                                </div>
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <span class="text-muted">Jami to'lov:</span>
-                                    <span class="fw-bold fs-4 text-success">{{ cart.get_total_price }} so'm</span>
-                                </div>
-                            </div>
-                        </div>
+    .address-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 6px;
+        background: linear-gradient(90deg, #fbbf24 0%, #f59e0b 50%, #fbbf24 100%);
+        background-size: 200% 100%;
+        animation: gradientMove 3s ease infinite;
+    }
 
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-dark btn-lg py-3 rounded-pill shadow">
-                                <i class="fas fa-check-double me-2"></i> Buyurtmani tasdiqlash
-                            </button>
-                            <a href="{% url 'cart' %}" class="btn btn-link text-muted">Savatchaga qaytish</a>
-                        </div>
-                    </form>
+    @keyframes gradientMove {
+        0%, 100% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+    }
+
+    .address-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .address-icon-wrapper {
+        width: 100px;
+        height: 100px;
+        margin: 0 auto 25px;
+        background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 15px 35px rgba(251, 191, 36, 0.4);
+        animation: float 3s ease-in-out infinite;
+        position: relative;
+    }
+
+    .address-icon-wrapper::before {
+        content: '';
+        position: absolute;
+        inset: -5px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #fbbf24, #f59e0b);
+        opacity: 0.3;
+        filter: blur(10px);
+        animation: pulse 2s ease infinite;
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+
+    @keyframes pulse {
+        0%, 100% { opacity: 0.3; transform: scale(1); }
+        50% { opacity: 0.5; transform: scale(1.1); }
+    }
+
+    .address-icon-wrapper i {
+        font-size: 3rem;
+        color: white;
+        position: relative;
+        z-index: 1;
+    }
+
+    .address-title {
+        font-size: 2.2rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 15px;
+    }
+
+    .address-subtitle {
+        color: #718096;
+        font-size: 1.05rem;
+        line-height: 1.6;
+        max-width: 500px;
+        margin: 0 auto;
+    }
+
+    .form-group {
+        margin-bottom: 30px;
+    }
+
+    .form-label {
+        display: block;
+        font-weight: 700;
+        color: #2d3748;
+        margin-bottom: 12px;
+        font-size: 1.1rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .form-label i {
+        color: #fbbf24;
+        font-size: 1.2rem;
+    }
+
+    .address-textarea {
+        width: 100%;
+        padding: 20px;
+        border: 3px solid #e2e8f0;
+        border-radius: 16px;
+        font-size: 1.05rem;
+        transition: all 0.3s ease;
+        background: #f7fafc;
+        resize: vertical;
+        min-height: 150px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .address-textarea:focus {
+        outline: none;
+        border-color: #fbbf24;
+        background: white;
+        box-shadow: 0 0 0 5px rgba(251, 191, 36, 0.1);
+    }
+
+    .address-textarea::placeholder {
+        color: #a0aec0;
+    }
+
+    .summary-card {
+        background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+        border-radius: 20px;
+        padding: 25px;
+        margin-bottom: 30px;
+        border: 2px solid #e2e8f0;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .summary-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 5px;
+        height: 100%;
+        background: linear-gradient(180deg, #fbbf24 0%, #f59e0b 100%);
+    }
+
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 0;
+    }
+
+    .summary-row:not(:last-child) {
+        border-bottom: 1px dashed #cbd5e0;
+    }
+
+    .summary-label {
+        color: #4a5568;
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .summary-label i {
+        color: #667eea;
+    }
+
+    .summary-value {
+        font-weight: 700;
+        color: #2d3748;
+        font-size: 1.05rem;
+    }
+
+    .total-row {
+        background: white;
+        border-radius: 12px;
+        padding: 15px;
+        margin-top: 15px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .total-label {
+        color: #2d3748;
+        font-size: 1.2rem;
+        font-weight: 700;
+    }
+
+    .total-value {
+        font-size: 1.8rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .btn-group {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .confirm-btn {
+        width: 100%;
+        padding: 18px;
+        border: none;
+        border-radius: 15px;
+        background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+        color: white;
+        font-weight: 700;
+        font-size: 1.15rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 8px 25px rgba(251, 191, 36, 0.4);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .confirm-btn::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.3);
+        transform: translate(-50%, -50%);
+        transition: width 0.6s, height 0.6s;
+    }
+
+    .confirm-btn:hover::before {
+        width: 400px;
+        height: 400px;
+    }
+
+    .confirm-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 35px rgba(251, 191, 36, 0.6);
+    }
+
+    .confirm-btn span {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .back-link {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        color: #718096;
+        text-decoration: none;
+        font-weight: 600;
+        padding: 12px;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+    }
+
+    .back-link:hover {
+        color: #667eea;
+        background: rgba(102, 126, 234, 0.1);
+    }
+
+    .info-box {
+        background: linear-gradient(135deg, #e6fffa 0%, #b2f5ea 100%);
+        border-left: 4px solid #38b2ac;
+        padding: 15px 20px;
+        border-radius: 12px;
+        margin-bottom: 25px;
+        display: flex;
+        align-items: start;
+        gap: 12px;
+    }
+
+    .info-box i {
+        color: #38b2ac;
+        font-size: 1.3rem;
+        margin-top: 2px;
+    }
+
+    .info-box-text {
+        color: #234e52;
+        font-size: 0.95rem;
+        line-height: 1.5;
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .address-card {
+            padding: 30px 20px;
+        }
+
+        .address-title {
+            font-size: 1.8rem;
+        }
+
+        .address-subtitle {
+            font-size: 0.95rem;
+        }
+
+        .total-value {
+            font-size: 1.5rem;
+        }
+    }
+</style>
+
+<div class="address-container">
+    <div class="address-card">
+        <div class="address-header">
+            <div class="address-icon-wrapper">
+                <i class="fas fa-map-marked-alt"></i>
+            </div>
+            <h3 class="address-title">
+                Yetkazib Berish Manzili
+            </h3>
+            <p class="address-subtitle">
+                Buyurtmani qabul qilish uchun to'liq manzilingizni kiriting. 
+                Biz Toshkent shahri bo'ylab tez va xavfsiz yetkazib beramiz.
+            </p>
+        </div>
+
+        <form method="POST" id="addressForm">
+            {% csrf_token %}
+            
+            <div class="info-box">
+                <i class="fas fa-info-circle"></i>
+                <div class="info-box-text">
+                    <strong>Diqqat!</strong> Iltimos, viloyat, tuman/shahar, ko'cha nomi va uy raqamini aniq yozing. 
+                    Bu buyurtmani tez yetkazib berishga yordam beradi.
                 </div>
             </div>
-        </div>
+
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-map-pin"></i>
+                    To'liq manzil
+                </label>
+                <textarea 
+                    name="address" 
+                    class="address-textarea" 
+                    rows="5"
+                    placeholder="Masalan: Toshkent shahar, Chilonzor tumani, Bunyodkor ko'chasi, 12-uy, 5-kvartira"
+                    required></textarea>
+            </div>
+
+            <div class="summary-card">
+                <div class="summary-row">
+                    <span class="summary-label">
+                        <i class="fas fa-box"></i>
+                        Mahsulotlar soni:
+                    </span>
+                    <span class="summary-value">{{ cart.items.count }} ta</span>
+                </div>
+                
+                <div class="summary-row total-row">
+                    <span class="total-label">
+                        <i class="fas fa-wallet me-2"></i>
+                        Jami to'lov:
+                    </span>
+                    <span class="total-value">{{ cart.get_total_price }} so'm</span>
+                </div>
+            </div>
+
+            <div class="btn-group">
+                <button type="submit" class="confirm-btn">
+                    <span>
+                        <i class="fas fa-check-double"></i>
+                        Buyurtmani Tasdiqlash
+                    </span>
+                </button>
+                
+                <a href="{% url 'cart' %}" class="back-link">
+                    <i class="fas fa-arrow-left"></i>
+                    Savatchaga qaytish
+                </a>
+            </div>
+        </form>
     </div>
 </div>
 
-<style>
-    body { background-color: #f8f9fa; }
-    .card { transition: transform 0.3s ease; }
-    .form-control:focus { border-color: #ffc107; box-shadow: none; }
-</style>
+<script>
+    // Form submit animatsiyasi
+    document.getElementById('addressForm').addEventListener('submit', function(e) {
+        const btn = this.querySelector('.confirm-btn');
+        const originalContent = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<span><i class="fas fa-spinner fa-spin"></i> Yuklanmoqda...</span>';
+        
+        // Agar xatolik bo'lsa, qaytarish
+        setTimeout(() => {
+            if (btn.disabled) {
+                btn.disabled = false;
+                btn.innerHTML = originalContent;
+            }
+        }, 5000);
+    });
+
+    // Textarea auto-resize
+    const textarea = document.querySelector('.address-textarea');
+    textarea.addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = (this.scrollHeight) + 'px';
+    });
+
+    // Character counter (optional)
+    textarea.addEventListener('input', function() {
+        const minChars = 20;
+        const currentLength = this.value.length;
+        
+        if (currentLength > 0 && currentLength < minChars) {
+            this.style.borderColor = '#f59e0b';
+        } else if (currentLength >= minChars) {
+            this.style.borderColor = '#48bb78';
+        } else {
+            this.style.borderColor = '#e2e8f0';
+        }
+    });
+</script>
+
 {% endblock %}

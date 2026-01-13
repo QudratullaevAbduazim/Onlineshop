@@ -3,88 +3,507 @@
 {% block title %}Hamyon - N72 Shop{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            
-            <div class="card shadow-lg border-0 bg-dark text-white mb-4">
-                <div class="card-body p-5 text-center">
-                    <i class="fas fa-wallet fa-3x mb-3 text-warning"></i>
-                    <h5 class="text-uppercase opacity-75">Sizning balansingiz</h5>
-                    <h1 class="display-3 fw-bold mb-0">{{ wallet.balance }} <span class="fs-4">so'm</span></h1>
-                </div>
-                <div class="card-footer bg-secondary bg-opacity-25 border-0 p-4">
-                    <form action="{% url 'wallet_topup' %}" method="POST" class="row g-2 justify-content-center">
-                        {% csrf_token %}
-                        <div class="col-auto">
-                            <input type="number" name="amount" class="form-control rounded-pill" placeholder="Summani kiriting" required min="1000">
-                        </div>
-                        <div class="col-auto">
-                            <button type="submit" class="btn btn-warning fw-bold px-4 rounded-pill">
-                                <i class="fas fa-plus-circle me-1"></i> To'ldirish
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
+<style>
+    .wallet-container {
+        min-height: 80vh;
+        padding: 40px 20px;
+    }
 
-            <div class="card shadow-sm border-0">
-                <div class="card-header bg-white py-3">
-                    <h5 class="mb-0 fw-bold"><i class="fas fa-history me-2"></i>Oxirgi amallar</h5>
+    .wallet-balance-card {
+        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #60a5fa 100%);
+        border-radius: 25px;
+        padding: 50px;
+        box-shadow: 0 20px 60px rgba(30, 58, 138, 0.4);
+        margin-bottom: 30px;
+        position: relative;
+        overflow: hidden;
+        animation: fadeInDown 0.6s ease;
+    }
+
+    .wallet-balance-card::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -20%;
+        width: 400px;
+        height: 400px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        animation: float 6s ease-in-out infinite;
+    }
+
+    .wallet-balance-card::after {
+        content: '';
+        position: absolute;
+        bottom: -30%;
+        left: -10%;
+        width: 300px;
+        height: 300px;
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 50%;
+        animation: float 8s ease-in-out infinite reverse;
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0) rotate(0deg); }
+        50% { transform: translateY(-20px) rotate(5deg); }
+    }
+
+    .balance-content {
+        position: relative;
+        z-index: 1;
+        text-align: center;
+        color: white;
+    }
+
+    .wallet-icon {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 20px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(10px);
+        animation: pulse 2s ease infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4); }
+        50% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(255, 255, 255, 0); }
+    }
+
+    .wallet-icon i {
+        font-size: 2.5rem;
+        color: #fbbf24;
+    }
+
+    .balance-label {
+        font-size: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        opacity: 0.9;
+        margin-bottom: 10px;
+    }
+
+    .balance-amount {
+        font-size: 3.5rem;
+        font-weight: 800;
+        margin: 0;
+        text-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .balance-currency {
+        font-size: 1.5rem;
+        font-weight: 600;
+        opacity: 0.9;
+    }
+
+    .topup-form {
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 25px;
+        margin-top: 30px;
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .topup-input {
+        flex: 1;
+        min-width: 250px;
+        padding: 15px 25px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50px;
+        font-size: 1.05rem;
+        background: rgba(255, 255, 255, 0.9);
+        transition: all 0.3s ease;
+    }
+
+    .topup-input:focus {
+        outline: none;
+        border-color: #fbbf24;
+        background: white;
+        box-shadow: 0 0 0 4px rgba(251, 191, 36, 0.2);
+    }
+
+    .topup-btn {
+        padding: 15px 35px;
+        border: none;
+        border-radius: 50px;
+        background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+        color: white;
+        font-weight: 700;
+        font-size: 1.05rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 6px 20px rgba(251, 191, 36, 0.4);
+        white-space: nowrap;
+    }
+
+    .topup-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(251, 191, 36, 0.6);
+    }
+
+    .transactions-card {
+        background: white;
+        border-radius: 25px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        animation: fadeInUp 0.6s ease;
+    }
+
+    .transactions-header {
+        background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+        padding: 25px 30px;
+        border-bottom: 3px solid #667eea;
+    }
+
+    .transactions-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #2d3748;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .transactions-title i {
+        color: #667eea;
+    }
+
+    .transactions-table {
+        width: 100%;
+    }
+
+    .transactions-table thead {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .transactions-table thead th {
+        padding: 18px 20px;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 1px;
+        border: none;
+    }
+
+    .transactions-table tbody tr {
+        border-bottom: 1px solid #e2e8f0;
+        transition: all 0.3s ease;
+    }
+
+    .transactions-table tbody tr:hover {
+        background: #f7fafc;
+        transform: scale(1.01);
+    }
+
+    .transactions-table tbody td {
+        padding: 20px;
+        vertical-align: middle;
+    }
+
+    .transaction-date {
+        color: #718096;
+        font-size: 0.95rem;
+    }
+
+    .transaction-type {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 600;
+    }
+
+    .type-income {
+        color: #48bb78;
+    }
+
+    .type-expense {
+        color: #f56565;
+    }
+
+    .status-badge {
+        padding: 6px 15px;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .badge-approved {
+        background: linear-gradient(135deg, #c6f6d5 0%, #9ae6b4 100%);
+        color: #22543d;
+    }
+
+    .badge-pending {
+        background: linear-gradient(135deg, #feebc8 0%, #fbd38d 100%);
+        color: #7c2d12;
+    }
+
+    .transaction-amount {
+        font-weight: 700;
+        font-size: 1.1rem;
+    }
+
+    .amount-positive {
+        color: #48bb78;
+    }
+
+    .amount-negative {
+        color: #f56565;
+    }
+
+    .cancel-btn {
+        background: linear-gradient(135deg, #fed7d7 0%, #feb2b2 100%);
+        color: #c53030;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .cancel-btn:hover {
+        background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+        color: white;
+        transform: scale(1.05);
+    }
+
+    .approved-icon {
+        color: #48bb78;
+        font-size: 1.2rem;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #a0aec0;
+    }
+
+    .empty-icon {
+        width: 100px;
+        height: 100px;
+        margin: 0 auto 20px;
+        background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .empty-icon i {
+        font-size: 3rem;
+        color: #cbd5e0;
+    }
+
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        color: #718096;
+        text-decoration: none;
+        font-weight: 600;
+        padding: 12px 25px;
+        border-radius: 50px;
+        transition: all 0.3s ease;
+        margin-top: 30px;
+    }
+
+    .back-link:hover {
+        color: #667eea;
+        background: rgba(102, 126, 234, 0.1);
+    }
+
+    @keyframes fadeInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .wallet-balance-card {
+            padding: 30px 20px;
+        }
+
+        .balance-amount {
+            font-size: 2.5rem;
+        }
+
+        .topup-form {
+            flex-direction: column;
+        }
+
+        .topup-input {
+            width: 100%;
+        }
+
+        .topup-btn {
+            width: 100%;
+        }
+
+        .transactions-table {
+            font-size: 0.9rem;
+        }
+
+        .transactions-table thead th,
+        .transactions-table tbody td {
+            padding: 12px 10px;
+        }
+    }
+</style>
+
+<div class="wallet-container">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                
+                <!-- BALANCE CARD -->
+                <div class="wallet-balance-card">
+                    <div class="balance-content">
+                        <div class="wallet-icon">
+                            <i class="fas fa-wallet"></i>
+                        </div>
+                        <div class="balance-label">Sizning balansingiz</div>
+                        <h1 class="balance-amount">
+                            {{ wallet.balance }}
+                            <span class="balance-currency">so'm</span>
+                        </h1>
+
+                        <!-- TOP UP FORM -->
+                        <form action="{% url 'wallet_topup' %}" method="POST" class="topup-form">
+                            {% csrf_token %}
+                            <input 
+                                type="number" 
+                                name="amount" 
+                                class="topup-input" 
+                                placeholder="Summani kiriting (min. 1000 so'm)" 
+                                required 
+                                min="1000"
+                                step="1000">
+                            <button type="submit" class="topup-btn">
+                                <i class="fas fa-plus-circle me-2"></i>
+                                To'ldirish
+                            </button>
+                        </form>
+                    </div>
                 </div>
-                <div class="card-body p-0">
+
+                <!-- TRANSACTIONS -->
+                <div class="transactions-card">
+                    <div class="transactions-header">
+                        <h5 class="transactions-title">
+                            <i class="fas fa-history"></i>
+                            Oxirgi Amallar
+                        </h5>
+                    </div>
+
                     <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0">
-                            <thead class="table-light">
+                        <table class="transactions-table">
+                            <thead>
                                 <tr>
                                     <th>Sana</th>
                                     <th>Turi</th>
                                     <th>Status</th>
-                                    <th class="text-end">Summa</th>
-                                    <th class="text-center">Amal</th> </tr>
+                                    <th style="text-align: right;">Summa</th>
+                                    <th style="text-align: center;">Amal</th>
+                                </tr>
                             </thead>
                             <tbody>
                                 {% for transaction in transactions %}
                                 <tr>
-                                    <td class="small text-muted">{{ transaction.created_at|date:"d.m.Y H:i" }}</td>
+                                    <td class="transaction-date">
+                                        {{ transaction.created_at|date:"d.m.Y H:i" }}
+                                    </td>
                                     <td>
                                         {% if transaction.transaction_type == 'topup' %}
-                                            <span class="text-primary"><i class="fas fa-arrow-up me-1"></i> Kirim</span>
+                                            <div class="transaction-type type-income">
+                                                <i class="fas fa-arrow-up"></i>
+                                                Kirim
+                                            </div>
                                         {% else %}
-                                            <span class="text-danger"><i class="fas fa-shopping-bag me-1"></i> Xarid</span>
+                                            <div class="transaction-type type-expense">
+                                                <i class="fas fa-shopping-bag"></i>
+                                                Xarid
+                                            </div>
                                         {% endif %}
                                     </td>
                                     <td>
                                         {% if transaction.is_approved %}
-                                            <span class="badge bg-success rounded-pill">Tasdiqlandi</span>
+                                            <span class="status-badge badge-approved">
+                                                Tasdiqlandi
+                                            </span>
                                         {% else %}
-                                            <span class="badge bg-warning text-dark rounded-pill">Kutilmoqda</span>
+                                            <span class="status-badge badge-pending">
+                                                Kutilmoqda
+                                            </span>
                                         {% endif %}
                                     </td>
-                                    <td class="text-end fw-bold">
+                                    <td style="text-align: right;">
                                         {% if transaction.transaction_type == 'topup' %}
-                                            <span class="text-success">+{{ transaction.amount }}</span>
+                                            <span class="transaction-amount amount-positive">
+                                                +{{ transaction.amount }} so'm
+                                            </span>
                                         {% else %}
-                                            <span class="text-danger">-{{ transaction.amount }}</span>
+                                            <span class="transaction-amount amount-negative">
+                                                -{{ transaction.amount }} so'm
+                                            </span>
                                         {% endif %}
                                     </td>
-                                    <td class="text-center"> {% if not transaction.is_approved %}
-                                        <form action="{% url 'transaction_cancel' transaction.pk %}" method="POST" onsubmit="return confirm('Haqiqatdan ham ushbu amalni bekor qilmoqchimisiz?')">
-                                            {% csrf_token %}
-                                            <button type="submit" class="btn btn-sm btn-outline-danger border-0">
-                                                <i class="fas fa-times-circle"></i> Bekor qilish
-                                            </button>
-                                        </form>
+                                    <td style="text-align: center;">
+                                        {% if not transaction.is_approved %}
+                                            <form action="{% url 'transaction_cancel' transaction.pk %}" method="POST" style="display: inline;">
+                                                {% csrf_token %}
+                                                <button 
+                                                    type="submit" 
+                                                    class="cancel-btn"
+                                                    onclick="return confirm('Haqiqatdan ham ushbu amalni bekor qilmoqchimisiz?')">
+                                                    <i class="fas fa-times-circle me-1"></i>
+                                                    Bekor qilish
+                                                </button>
+                                            </form>
                                         {% else %}
-                                            <i class="fas fa-check-double text-muted small"></i>
+                                            <i class="fas fa-check-double approved-icon"></i>
                                         {% endif %}
                                     </td>
                                 </tr>
                                 {% empty %}
                                 <tr>
-                                    <td colspan="5" class="text-center py-5 text-muted">
-                                        <i class="fas fa-folder-open fa-2x mb-2 d-block opacity-25"></i>
-                                        Hozircha amallar mavjud emas.
+                                    <td colspan="5">
+                                        <div class="empty-state">
+                                            <div class="empty-icon">
+                                                <i class="fas fa-folder-open"></i>
+                                            </div>
+                                            <h5>Hozircha amallar mavjud emas</h5>
+                                            <p>Hamyoningizni to'ldiring yoki xarid qiling</p>
+                                        </div>
                                     </td>
                                 </tr>
                                 {% endfor %}
@@ -92,22 +511,18 @@
                         </table>
                     </div>
                 </div>
-            </div>
 
-            <div class="text-center mt-4">
-                <a href="{% url 'cart' %}" class="btn btn-link text-decoration-none text-muted">
-                    <i class="fas fa-arrow-left me-1"></i> Savatchaga qaytish
-                </a>
-            </div>
+                <!-- BACK LINK -->
+                <div class="text-center">
+                    <a href="{% url 'cart' %}" class="back-link">
+                        <i class="fas fa-arrow-left"></i>
+                        Savatchaga qaytish
+                    </a>
+                </div>
 
+            </div>
         </div>
     </div>
 </div>
 
-<style>
-    .card { transition: transform 0.2s; }
-    .table thead th { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; }
-    .badge { font-weight: 500; font-size: 0.75rem; }
-    .btn-outline-danger:hover { background-color: #dc3545; color: white; }
-</style>
 {% endblock %}

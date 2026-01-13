@@ -1,27 +1,396 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-8 text-center py-5">
-        <h1 class="display-4 fw-bold mb-4">N72 Onlayn Do'koni haqida</h1>
-        <p class="lead text-muted">
-            Bizning do'konimiz 2024-yildan beri mijozlarga eng sifatli mahsulotlarni va 
-            ishonchli to'lov tizimini taqdim etib kelmoqda.
-        </p>
-        <div class="row mt-5">
-            <div class="col-md-4">
-                <h3>100% Sifat</h3>
-                <p>Faqat sinalgan brendlar</p>
+<style>
+    .about-container {
+        min-height: 80vh;
+        padding: 60px 20px;
+    }
+
+    .about-hero {
+        text-align: center;
+        margin-bottom: 80px;
+        animation: fadeInDown 0.8s ease;
+    }
+
+    .about-badge {
+        display: inline-block;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 10px 25px;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 25px;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .about-title {
+        font-size: 3.5rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 25px;
+        line-height: 1.2;
+    }
+
+    .about-subtitle {
+        font-size: 1.3rem;
+        color: #2d3748;
+        max-width: 800px;
+        margin: 0 auto 40px;
+        line-height: 1.8;
+        font-weight: 500;
+    }
+
+    .stats-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        max-width: 900px;
+        margin: 0 auto 80px;
+    }
+
+    .stat-card {
+        background: white;
+        padding: 30px;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        animation: fadeInUp 0.8s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    .stat-number {
+        font-size: 3rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 10px;
+    }
+
+    .stat-label {
+        font-size: 1.1rem;
+        color: #2d3748;
+        font-weight: 600;
+    }
+
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 30px;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .feature-card {
+        background: white;
+        border-radius: 25px;
+        padding: 40px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        transition: all 0.4s ease;
+        position: relative;
+        overflow: hidden;
+        animation: fadeInUp 1s ease;
+    }
+
+    .feature-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 5px;
+        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.4s ease;
+    }
+
+    .feature-card:hover::before {
+        transform: scaleX(1);
+    }
+
+    .feature-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+    }
+
+    .feature-icon-wrapper {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 25px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        transition: all 0.4s ease;
+    }
+
+    .feature-card:hover .feature-icon-wrapper {
+        transform: scale(1.1) rotate(5deg);
+    }
+
+    .feature-icon-wrapper i {
+        font-size: 2.5rem;
+        color: white;
+    }
+
+    .feature-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #2d3748;
+        margin-bottom: 15px;
+    }
+
+    .feature-description {
+        font-size: 1.05rem;
+        color: #4a5568;
+        line-height: 1.7;
+        font-weight: 500;
+    }
+
+    .feature-card:nth-child(1) .feature-icon-wrapper {
+        background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+        box-shadow: 0 10px 25px rgba(72, 187, 120, 0.3);
+    }
+
+    .feature-card:nth-child(2) .feature-icon-wrapper {
+        background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+        box-shadow: 0 10px 25px rgba(66, 153, 225, 0.3);
+    }
+
+    .feature-card:nth-child(3) .feature-icon-wrapper {
+        background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+        box-shadow: 0 10px 25px rgba(237, 137, 54, 0.3);
+    }
+
+    .cta-section {
+        text-align: center;
+        margin-top: 80px;
+        padding: 60px 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 30px;
+        color: white;
+        animation: fadeInUp 1.2s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .cta-section::before,
+    .cta-section::after {
+        content: '';
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    .cta-section::before {
+        width: 300px;
+        height: 300px;
+        top: -100px;
+        right: -50px;
+        animation: float 6s ease-in-out infinite;
+    }
+
+    .cta-section::after {
+        width: 200px;
+        height: 200px;
+        bottom: -80px;
+        left: -30px;
+        animation: float 8s ease-in-out infinite reverse;
+    }
+
+    .cta-content {
+        position: relative;
+        z-index: 1;
+    }
+
+    .cta-title {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin-bottom: 20px;
+    }
+
+    .cta-text {
+        font-size: 1.2rem;
+        margin-bottom: 35px;
+        opacity: 0.95;
+    }
+
+    .cta-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        padding: 18px 40px;
+        background: white;
+        color: #667eea;
+        border: none;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 1.1rem;
+        text-decoration: none;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease;
+    }
+
+    .cta-button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        color: #667eea;
+    }
+
+    @keyframes fadeInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-50px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(50px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0) rotate(0deg); }
+        50% { transform: translateY(-20px) rotate(5deg); }
+    }
+
+    @media (max-width: 768px) {
+        .about-title {
+            font-size: 2.5rem;
+        }
+
+        .about-subtitle {
+            font-size: 1.1rem;
+        }
+
+        .features-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .cta-title {
+            font-size: 2rem;
+        }
+
+        .cta-text {
+            font-size: 1.1rem;
+        }
+    }
+</style>
+
+<div class="about-container">
+    <div class="container">
+        
+        <!-- HERO SECTION -->
+        <div class="about-hero">
+            <span class="about-badge">
+                <i class="fas fa-star me-2"></i>
+                Biz haqimizda
+            </span>
+            <h1 class="about-title">
+                N72 Online Do'koni
+            </h1>
+            <p class="about-subtitle">
+                Bizning do'konimiz 2024-yildan beri mijozlarga eng sifatli mahsulotlarni va 
+                ishonchli to'lov tizimini taqdim etib kelmoqda. Har bir mijozimiz biz uchun muhim!
+            </p>
+        </div>
+
+        <!-- STATISTICS -->
+        <div class="stats-container">
+            <div class="stat-card">
+                <div class="stat-number">1000+</div>
+                <div class="stat-label">Mijozlar</div>
             </div>
-            <div class="col-md-4">
-                <h3>Tezkor Hamyon</h3>
-                <p>Xavfsiz tranzaksiyalar</p>
+            <div class="stat-card">
+                <div class="stat-number">500+</div>
+                <div class="stat-label">Mahsulotlar</div>
             </div>
-            <div class="col-md-4">
-                <h3>24/7 Qo'llab-quvvatlash</h3>
-                <p>Har doim yordamga tayyormiz</p>
+            <div class="stat-card">
+                <div class="stat-number">100%</div>
+                <div class="stat-label">Kafolat</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">24/7</div>
+                <div class="stat-label">Xizmat</div>
             </div>
         </div>
+
+        <!-- FEATURES -->
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon-wrapper">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h3 class="feature-title">100% Sifat</h3>
+                <p class="feature-description">
+                    Faqat sinalgan va ishonchli brendlardan mahsulotlar. 
+                    Har bir mahsulot sifat nazoratidan o'tadi va kafolatlanadi.
+                </p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon-wrapper">
+                    <i class="fas fa-wallet"></i>
+                </div>
+                <h3 class="feature-title">Tezkor Hamyon</h3>
+                <p class="feature-description">
+                    Xavfsiz va tezkor to'lov tizimi. Pullaringiz to'liq himoyalangan 
+                    va tranzaksiyalar bir necha soniyada amalga oshiriladi.
+                </p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon-wrapper">
+                    <i class="fas fa-headset"></i>
+                </div>
+                <h3 class="feature-title">24/7 Qo'llab-quvvatlash</h3>
+                <p class="feature-description">
+                    Har doim sizning yordamingizga tayyormiz. Professional jamoa 
+                    kunning istalgan vaqtida sizga yordam beradi.
+                </p>
+            </div>
+        </div>
+
+        <!-- CTA SECTION -->
+        <div class="cta-section">
+            <div class="cta-content">
+                <h2 class="cta-title">Bizga qo'shiling!</h2>
+                <p class="cta-text">
+                    Minglab mijozlar biz bilan xarid qilishdan mamnun. Siz ham qo'shiling!
+                </p>
+                <a href="{% url 'index' %}" class="cta-button">
+                    <i class="fas fa-shopping-bag"></i>
+                    Xarid Qilishni Boshlang
+                </a>
+            </div>
+        </div>
+
     </div>
 </div>
+
 {% endblock %}

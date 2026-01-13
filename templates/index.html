@@ -1,77 +1,185 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="row mb-4">
-    <div class="col-md-12">
-        <form action="{% url 'index' %}" method="get" class="d-flex shadow-sm rounded">
-            <input type="text" name="q" class="form-control form-control-lg border-0" placeholder="Mahsulotlarni qidirish..." value="{{ request.GET.q }}">
-            <button type="submit" class="btn btn-dark px-4">
-                <i class="fas fa-search"></i> Qidirish
-            </button>
-        </form>
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-md-3">
-        <div class="list-group shadow-sm border-0 mb-4">
-            <a href="{% url 'index' %}" class="list-group-item list-group-item-action {% if not current_category %}active bg-dark border-dark{% endif %}">
-                Barcha mahsulotlar
-            </a>
-            {% for category in categories %}
-                <a href="?category={{ category.id }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
-                   class="list-group-item list-group-item-action {% if current_category == category.id|stringformat:'i' %}active bg-dark border-dark{% endif %}">
-                    {{ category.name }}
-                </a>
-            {% endfor %}
+<div class="container-fluid py-4 animate__animated animate__fadeIn">
+    
+    <div class="row mb-5 justify-content-center">
+        <div class="col-md-10 col-lg-8">
+            <form action="{% url 'index' %}" method="get" class="search-box-modern d-flex shadow-lg rounded-pill overflow-hidden bg-white">
+                <input type="text" name="q" class="form-control border-0 ps-4 py-3 shadow-none" 
+                       placeholder="Mahsulotlarni qidirish..." value="{{ request.GET.q }}">
+                <button type="submit" class="btn btn-dark px-5 fw-bold">
+                    <i class="fas fa-search me-2"></i> Qidirish
+                </button>
+            </form>
         </div>
     </div>
 
-    <div class="col-md-9">
-        {% if products %}
-            <div class="row row-cols-1 row-cols-md-3 g-4">
-                {% for product in products %}
-                <div class="col">
-                    <div class="card h-100 border-0 shadow-sm product-card overflow-hidden">
-                        <div class="product-image-wrapper" style="height: 200px; overflow: hidden; background-color: #f8f9fa;">
-                            {% if product.image %}
-                                <img src="{{ product.image.url }}" class="card-img-top w-100 h-100" alt="{{ product.name }}" style="object-fit: cover;">
-                            {% else %}
-                                <div class="d-flex align-items-center justify-content-center h-100 text-muted">
-                                    <i class="fas fa-image fa-3x"></i>
-                                </div>
+    <div class="row px-md-4">
+        <div class="col-md-3 mb-4">
+            <div class="category-sidebar shadow-sm border-0 rounded-4 overflow-hidden sticky-top" style="top: 100px;">
+                <div class="sidebar-header d-flex align-items-center">
+                    <div class="header-icon-box me-3">
+                        <i class="fas fa-th-list"></i>
+                    </div>
+                    <span class="fw-bold m-0 text-uppercase small" style="letter-spacing: 1px;">Kategoriyalar</span>
+                </div>
+                
+                <div class="list-group list-group-flush p-2 bg-white">
+                    <a href="{% url 'index' %}" 
+                       class="category-item {% if not current_category %}active{% endif %}">
+                        <span class="cat-icon"><i class="fas fa-border-all"></i></span>
+                        <span class="cat-name">Barcha mahsulotlar</span>
+                        {% if not current_category %}
+                            <span class="cat-badge"><i class="fas fa-check-circle"></i></span>
+                        {% endif %}
+                    </a>
+
+                    {% for category in categories %}
+                        <a href="?category={{ category.id }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
+                           class="category-item {% if current_category == category.id|stringformat:'i' %}active{% endif %}">
+                            <span class="cat-icon"><i class="fas fa-folder"></i></span>
+                            <span class="cat-name">{{ category.name }}</span>
+                            {% if current_category == category.id|stringformat:'i' %}
+                                <span class="cat-badge"><i class="fas fa-check-circle"></i></span>
                             {% endif %}
-                        </div>
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
 
-                        <div class="card-body">
-                            <h5 class="card-title fw-bold text-truncate">{{ product.name }}</h5>
-                            <p class="text-success fs-5 fw-bold mb-0">{{ product.price }} so'm</p>
-                        </div>
+        <div class="col-md-9">
+            {% if products %}
+                <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4">
+                    {% for product in products %}
+                    <div class="col">
+                        <div class="card h-100 product-card border-0 shadow-sm rounded-4 overflow-hidden">
+                            <div class="image-zoom-wrapper p-3 bg-white" style="height: 240px; display: flex; align-items: center; justify-content: center;">
+                                {% if product.image %}
+                                    <img src="{{ product.image.url }}" class="img-fluid rounded-3" alt="{{ product.name }}" style="max-height: 100%; object-fit: contain;">
+                                {% else %}
+                                    <div class="text-muted text-center">
+                                        <i class="fas fa-image fa-3x mb-2 opacity-25"></i>
+                                        <p class="small mb-0">Rasm yo'q</p>
+                                    </div>
+                                {% endif %}
+                                <div class="price-tag">{{ product.price }} so'm</div>
+                            </div>
 
-                        <div class="card-footer bg-white border-0 d-flex gap-2 pb-3">
-                            <a href="{% url 'product_detail' product.id %}" class="btn btn-outline-dark flex-grow-1">Ko'rish</a>
-                            <form action="{% url 'add_to_cart' product.id %}" method="post">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-primary px-3">
-                                    <i class="fas fa-cart-plus"></i>
-                                </button>
-                            </form>
+                            <div class="card-body pt-2">
+                                <h6 class="card-title fw-bold text-dark mb-1 text-truncate">{{ product.name }}</h6>
+                                <p class="text-muted small mb-3">Premium mahsulot</p>
+                                
+                                <div class="d-flex gap-2">
+                                    <a href="{% url 'product_detail' product.id %}" class="btn btn-outline-primary flex-grow-1 rounded-pill fw-bold small py-2">
+                                        Ko'rish
+                                    </a>
+                                    <form action="{% url 'add_to_cart' product.id %}" method="post" class="m-0">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-primary rounded-circle shadow-sm d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                            <i class="fas fa-cart-plus"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
                         </div>
                     </div>
+                    {% endfor %}
                 </div>
-                {% endfor %}
-            </div>
-        {% else %}
-            <div class="text-center py-5">
-                <h4 class="text-muted">Afsuski, hech narsa topilmadi.</h4>
-                <a href="{% url 'index' %}" class="btn btn-link">Barcha mahsulotlarga qaytish</a>
-            </div>
-        {% endif %}
+            {% else %}
+                <div class="text-center py-5 bg-white rounded-4 shadow-sm">
+                    <img src="https://cdn-icons-png.flaticon.com/512/7486/7486744.png" width="100" class="mb-3 opacity-50">
+                    <h5 class="text-muted fw-bold">Hech narsa topilmadi</h5>
+                    <a href="{% url 'index' %}" class="btn btn-primary rounded-pill mt-3 px-4">Barcha mahsulotlar</a>
+                </div>
+            {% endif %}
+        </div>
     </div>
 </div>
 
 <style>
-    .product-card { transition: transform 0.2s ease-in-out; border-radius: 12px; }
-    .product-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important; }
+    /* 1. Qidiruv paneli */
+    .search-box-modern {
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
+    }
+    .search-box-modern:focus-within {
+        border-color: var(--primary-bg);
+        transform: translateY(-2px);
+    }
+
+    /* 2. Bo'limlar (Kategoriyalar) */
+    .sidebar-header {
+        background: #f8f9fa;
+        padding: 15px 20px;
+        border-bottom: 1px solid #eee;
+    }
+    .header-icon-box {
+        width: 32px; height: 32px;
+        background: var(--primary-bg);
+        color: white;
+        border-radius: 8px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 0.8rem;
+    }
+    .category-item {
+        display: flex; align-items: center;
+        padding: 12px 15px; margin-bottom: 4px;
+        border-radius: 12px; text-decoration: none;
+        color: #4a5568; font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    .cat-icon {
+        width: 30px; height: 30px;
+        display: flex; align-items: center; justify-content: center;
+        background: #f1f3f9; border-radius: 8px;
+        margin-right: 12px; font-size: 0.8rem;
+    }
+    .cat-name { flex-grow: 1; font-size: 0.95rem; }
+    .category-item:hover {
+        background: #f0f4ff; color: var(--primary-bg);
+        transform: translateX(5px);
+    }
+    .category-item.active {
+        background: var(--primary-bg) !important;
+        color: white !important;
+        box-shadow: 0 4px 15px rgba(93, 72, 185, 0.2);
+    }
+    .category-item.active .cat-icon { background: rgba(255,255,255,0.2); color: white; }
+
+    /* 3. Mahsulot kartasi */
+    .product-card {
+        transition: all 0.4s ease;
+        background: white;
+    }
+    .product-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 35px rgba(0,0,0,0.1) !important;
+    }
+    .price-tag {
+        position: absolute; top: 15px; right: 15px;
+        background: #48bb78; color: white;
+        padding: 4px 12px; border-radius: 50px;
+        font-size: 0.8rem; font-weight: 800;
+        box-shadow: 0 4px 10px rgba(72, 187, 120, 0.3);
+    }
+    .image-zoom-wrapper { position: relative; overflow: hidden; }
+    .product-card:hover img { transform: scale(1.08); transition: 0.5s ease; }
+
+    /* 4. DARK MODE MOSLASHUVI */
+    body.dark-mode .category-sidebar,
+    body.dark-mode .list-group,
+    body.dark-mode .bg-white,
+    body.dark-mode .product-card {
+        background-color: #1e1e1e !important;
+        color: white;
+    }
+    body.dark-mode .sidebar-header { background: #252525; border-color: #333; color: white; }
+    body.dark-mode .category-item { color: #ccc; }
+    body.dark-mode .cat-icon { background: #2d2d2d; }
+    body.dark-mode .card-title { color: white !important; }
+    body.dark-mode .search-box-modern { background: #1e1e1e !important; border-color: #333; }
+    body.dark-mode .search-box-modern input { background: #1e1e1e; color: white; }
 </style>
 {% endblock %}

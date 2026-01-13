@@ -1,36 +1,46 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container mt-4">
-    <div class="row mb-5">
-        <div class="col-md-10 mx-auto">
-            <form action="{% url 'index' %}" method="get" class="d-flex shadow-sm rounded-pill overflow-hidden bg-white border">
-                <input type="text" name="q" class="form-control border-0 px-4 py-3"
-                       placeholder="Mahsulot nomini yoki tavsifini yozing..."
-                       value="{{ request.GET.q|default:'' }}">
-                <button type="submit" class="btn btn-dark px-5 rounded-pill m-1">
+<div class="container-fluid py-4 animate__animated animate__fadeIn">
+    
+    <div class="row mb-5 justify-content-center">
+        <div class="col-md-10 col-lg-8">
+            <form action="{% url 'index' %}" method="get" class="search-box-modern d-flex shadow-lg rounded-pill overflow-hidden bg-white">
+                <input type="text" name="q" class="form-control border-0 ps-4 py-3 shadow-none" 
+                       placeholder="Mahsulot nomini yoki tavsifini yozing..." value="{{ request.GET.q|default:'' }}">
+                <button type="submit" class="btn btn-dark px-5 fw-bold">
                     <i class="fas fa-search me-2"></i> Qidirish
                 </button>
             </form>
         </div>
     </div>
 
-    <div class="row">
+    <div class="row px-md-4">
         <div class="col-lg-3 mb-4">
-            <div class="card border-0 shadow-sm sticky-top" style="top: 20px;">
-                <div class="card-header bg-dark text-white fw-bold">
-                    <i class="fas fa-list me-2"></i> Kategoriyalar
+            <div class="category-sidebar shadow-sm border-0 rounded-4 overflow-hidden sticky-top" style="top: 100px;">
+                <div class="sidebar-header d-flex align-items-center">
+                    <div class="header-icon-box me-3">
+                        <i class="fas fa-th-large"></i>
+                    </div>
+                    <span class="fw-bold m-0 text-uppercase small" style="letter-spacing: 1px;">Kategoriyalar</span>
                 </div>
-                <div class="list-group list-group-flush">
-                    <a href="{% url 'index' %}"
-                       class="list-group-item list-group-item-action {% if not current_category %}active{% endif %}">
-                        Barcha mahsulotlar
+                
+                <div class="list-group list-group-flush p-2 bg-white">
+                    <a href="{% url 'index' %}" 
+                       class="category-item {% if not current_category %}active{% endif %}">
+                        <span class="cat-icon"><i class="fas fa-border-all"></i></span>
+                        <span class="cat-name">Barcha mahsulotlar</span>
+                        <span class="badge rounded-pill bg-light text-dark border">{{ total_products_count|default:"all" }}</span>
                     </a>
+
                     {% for category in categories %}
                         <a href="?category={{ category.id }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
-                           class="list-group-item list-group-item-action d-flex justify-content-between align-items-center {% if current_category == category.id|stringformat:'i' %}active{% endif %}">
-                            {{ category.name }}
-                            <span class="badge bg-secondary rounded-pill">{{ category.product_set.count }}</span>
+                           class="category-item {% if current_category == category.id|stringformat:'i' %}active{% endif %}">
+                            <span class="cat-icon"><i class="fas fa-tag"></i></span>
+                            <span class="cat-name">{{ category.name }}</span>
+                            <span class="badge rounded-pill {% if current_category == category.id|stringformat:'i' %}bg-white text-primary{% else %}bg-light text-muted border{% endif %}">
+                                {{ category.product_set.count }}
+                            </span>
                         </a>
                     {% endfor %}
                 </div>
@@ -38,73 +48,86 @@
         </div>
 
         <div class="col-lg-9">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h3 class="fw-bold">
+            <div class="d-flex justify-content-between align-items-center mb-4 px-2">
+                <h3 class="fw-bold m-0">
                     {% if current_category %}
+                        <i class="fas fa-folder-open text-primary me-2"></i>
                         {% for cat in categories %}{% if current_category == cat.id|stringformat:'i' %}{{ cat.name }}{% endif %}{% endfor %}
                     {% else %}
-                        Bizning Mahsulotlar
+                        <i class="fas fa-store text-primary me-2"></i> Bizning Mahsulotlar
                     {% endif %}
                 </h3>
-                <span class="text-muted">{{ products.count }} ta mahsulot topildi</span>
+                <span class="badge bg-soft-primary text-primary px-3 py-2 rounded-pill">
+                    {{ products.count }} ta mahsulot
+                </span>
             </div>
 
             {% if products %}
             <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
                 {% for product in products %}
                 <div class="col">
-                    <div class="card h-100 shadow-sm border-0 product-card overflow-hidden">
-                        <div class="position-relative">
+                    <div class="card h-100 product-card border-0 shadow-sm rounded-4 overflow-hidden">
+                        <div class="position-relative overflow-hidden" style="height: 240px; background: #fff;">
                             {% if product.image %}
-                                <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}" style="height: 220px; object-fit: cover;">
+                                <img src="{{ product.image.url }}" class="card-img-top w-100 h-100" alt="{{ product.name }}" style="object-fit: contain; padding: 15px;">
                             {% else %}
-                                <div class="bg-light d-flex align-items-center justify-content-center text-muted" style="height: 220px;">
-                                    <i class="fas fa-image fa-3x"></i>
+                                <div class="bg-light d-flex align-items-center justify-content-center text-muted h-100">
+                                    <i class="fas fa-image fa-3x opacity-25"></i>
                                 </div>
                             {% endif %}
 
-                            {% if product.quantity < 5 and product.quantity > 0 %}
-                                <span class="position-absolute top-0 end-0 m-2 badge bg-warning text-dark">Kam qoldi!</span>
-                            {% elif product.quantity == 0 %}
-                                <span class="position-absolute top-0 end-0 m-2 badge bg-danger text-white">Sotuvda yo'q</span>
-                            {% endif %}
-                        </div>
-
-                        <div class="card-body">
-                            <h5 class="card-title fw-bold text-truncate">{{ product.name }}</h5>
-                            <p class="card-text text-muted small mb-2">{{ product.description|truncatewords:8 }}</p>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="h5 mb-0 text-success fw-bold">{{ product.price }} so'm</span>
+                            <div class="position-absolute top-0 start-0 m-3 d-flex flex-column gap-2">
+                                {% if product.quantity < 5 and product.quantity > 0 %}
+                                    <span class="badge bg-warning text-dark shadow-sm animate__animated animate__pulse animate__infinite">
+                                        <i class="fas fa-exclamation-triangle me-1"></i> Kam qoldi!
+                                    </span>
+                                {% elif product.quantity == 0 %}
+                                    <span class="badge bg-danger shadow-sm">
+                                        <i class="fas fa-times-circle me-1"></i> Sotuvda yo'q
+                                    </span>
+                                {% endif %}
                             </div>
+                            
+                            <div class="price-badge">{{ product.price }} so'm</div>
                         </div>
 
-                        <div class="card-footer bg-white border-0 d-flex gap-2 pb-3">
-                            <a href="{% url 'product_detail' product.id %}" class="btn btn-outline-dark flex-grow-1 shadow-sm">
-                                <i class="fas fa-eye"></i> Batafsil
-                            </a>
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title fw-bold text-dark text-truncate mb-2">{{ product.name }}</h5>
+                            <p class="card-text text-muted small mb-3">
+                                {{ product.description|truncatewords:10 }}
+                            </p>
+                            
+                            <div class="mt-auto d-flex gap-2">
+                                <a href="{% url 'product_detail' product.id %}" class="btn btn-outline-primary flex-grow-1 rounded-pill fw-bold small">
+                                    <i class="fas fa-eye me-1"></i> Batafsil
+                                </a>
 
-                            {% if product.quantity > 0 %}
-                            <form action="{% url 'add_to_cart' product.id %}" method="post">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-primary shadow-sm px-3" title="Savatchaga qo'shish">
-                                    <i class="fas fa-cart-plus"></i>
+                                {% if product.quantity > 0 %}
+                                <form action="{% url 'add_to_cart' product.id %}" method="post" class="m-0">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-primary rounded-circle shadow-sm d-flex align-items-center justify-content-center" style="width: 42px; height: 42px;">
+                                        <i class="fas fa-cart-plus"></i>
+                                    </button>
+                                </form>
+                                {% else %}
+                                <button class="btn btn-secondary disabled rounded-circle" style="width: 42px; height: 42px;">
+                                    <i class="fas fa-ban"></i>
                                 </button>
-                            </form>
-                            {% else %}
-                            <button class="btn btn-secondary disabled px-3">
-                                <i class="fas fa-ban"></i>
-                            </button>
-                            {% endif %}
+                                {% endif %}
+                            </div>
                         </div>
                     </div>
                 </div>
                 {% endfor %}
             </div>
             {% else %}
-            <div class="text-center py-5">
-                <i class="fas fa-search-minus fa-4x text-muted mb-3"></i>
-                <h4 class="text-muted">Hech qanday mahsulot topilmadi</h4>
-                <a href="{% url 'index' %}" class="btn btn-primary mt-3">Barcha mahsulotlarga qaytish</a>
+            <div class="text-center py-5 bg-white rounded-4 shadow-sm animate__animated animate__zoomIn">
+                <i class="fas fa-search-minus fa-4x text-muted mb-3 opacity-25"></i>
+                <h4 class="text-muted fw-bold">Afsuski, hech narsa topilmadi</h4>
+                <p class="text-secondary small">Boshqa kalit so'zlar bilan qidirib ko'ring</p>
+                <a href="{% url 'index' %}" class="btn btn-primary rounded-pill mt-2 px-4">
+                    Barcha mahsulotlar
+                </a>
             </div>
             {% endif %}
         </div>
@@ -112,8 +135,42 @@
 </div>
 
 <style>
-    .product-card { transition: transform 0.3s ease; }
-    .product-card:hover { transform: translateY(-5px); }
-    .list-group-item.active { background-color: #212529; border-color: #212529; }
+    /* SIDEBAR STILLARI */
+    .category-sidebar { background: white; transition: all 0.3s ease; }
+    .sidebar-header { background: #f8f9fa; padding: 15px 20px; border-bottom: 1px solid #eee; }
+    .header-icon-box { width: 32px; height: 32px; background: var(--primary-bg); color: white; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+    
+    .category-item {
+        display: flex; align-items: center; padding: 12px 15px; margin-bottom: 4px;
+        border-radius: 12px; text-decoration: none; color: #4a5568; font-weight: 500; transition: all 0.3s ease;
+    }
+    .cat-icon { width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; background: #f1f3f9; border-radius: 8px; margin-right: 12px; font-size: 0.8rem; }
+    .cat-name { flex-grow: 1; font-size: 0.95rem; }
+    
+    .category-item:hover { background: #f0f4ff; color: var(--primary-bg); transform: translateX(5px); }
+    .category-item.active { background: var(--primary-bg) !important; color: white !important; box-shadow: 0 4px 15px rgba(111, 66, 193, 0.2); }
+    .category-item.active .cat-icon { background: rgba(255,255,255,0.2); color: white; }
+    .category-item.active .badge { border: none !important; }
+
+    /* MAHSULOT KARTASI */
+    .product-card { transition: all 0.4s ease; background: white; }
+    .product-card:hover { transform: translateY(-10px); box-shadow: 0 15px 35px rgba(0,0,0,0.1) !important; }
+    .price-badge {
+        position: absolute; bottom: 15px; right: 15px; background: #48bb78; color: white;
+        padding: 5px 15px; border-radius: 50px; font-weight: 800; font-size: 0.9rem; box-shadow: 0 4px 10px rgba(72, 187, 120, 0.3);
+    }
+    .bg-soft-primary { background: rgba(111, 66, 193, 0.1); }
+
+    /* DARK MODE */
+    body.dark-mode .category-sidebar, body.dark-mode .bg-white, body.dark-mode .product-card, body.dark-mode .list-group-item {
+        background-color: #1e1e1e !important; color: white;
+    }
+    body.dark-mode .sidebar-header { background: #252525; border-color: #333; color: white; }
+    body.dark-mode .category-item { color: #ccc; }
+    body.dark-mode .cat-icon { background: #2d2d2d; }
+    body.dark-mode .card-title, body.dark-mode h3 { color: white !important; }
+    body.dark-mode .search-box-modern { background: #1e1e1e !important; border: 1px solid #333; }
+    body.dark-mode .search-box-modern input { background: #1e1e1e; color: white; }
+    body.dark-mode .bg-light { background-color: #2d2d2d !important; }
 </style>
 {% endblock %}

@@ -1,23 +1,135 @@
 {% extends 'base.html' %}
 
+{% block title %}Tahrirlash: {{ product.name }}{% endblock %}
+
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-8">
-        <div class="card shadow-sm border-0">
-            <div class="card-header bg-warning text-dark">
-                <h4 class="mb-0">Mahsulotni tahrirlash: {{ product.name }}</h4>
-            </div>
-            <div class="card-body p-4">
-                <form method="post" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    {{ form.as_p }}
-                    <div class="d-grid gap-2 mt-4">
-                        <button type="submit" class="btn btn-warning btn-lg">O'zgarishlarni saqlash</button>
-                        <a href="{% url 'product_detail' product.id %}" class="btn btn-outline-secondary">Orqaga</a>
+<div class="container py-5 animate__animated animate__fadeIn">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card admin-card shadow-lg border-0 rounded-4 overflow-hidden">
+                <div class="edit-card-header p-4 text-center">
+                    <div class="edit-icon-circle mb-3">
+                        <i class="fas fa-edit fa-2x text-white"></i>
                     </div>
-                </form>
+                    <h2 class="fw-bold mb-0 text-white">Tahrirlash</h2>
+                    <p class="text-white-50 small">{{ product.name }} mahsulotini o'zgartirish</p>
+                </div>
+
+                <div class="card-body p-4 p-lg-5 bg-white-custom">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+
+                        <div class="form-wrapper">
+                            {% for field in form %}
+                                <div class="mb-4 custom-form-group">
+                                    <label for="{{ field.id_for_label }}" class="form-label fw-bold text-dark small">
+                                        {{ field.label }}
+                                    </label>
+                                    
+                                    <div class="input-container">
+                                        {{ field }}
+                                    </div>
+
+                                    {% if field.help_text %}
+                                        <div class="form-text text-muted small">{{ field.help_text }}</div>
+                                    {% endif %}
+
+                                    {% if field.errors %}
+                                        {% for error in field.errors %}
+                                            <div class="text-danger small mt-1 animate__animated animate__headShake">
+                                                <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                            </div>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="d-grid gap-2 mt-5">
+                            <button type="submit" class="btn btn-warning btn-lg rounded-pill shadow-sm fw-bold py-3 text-dark transition-hover">
+                                <i class="fas fa-check-circle me-2"></i> O'zgarishlarni saqlash
+                            </button>
+                            <a href="{% url 'product_detail' product.id %}" class="btn btn-link text-decoration-none text-muted fw-bold py-2 mt-2">
+                                <i class="fas fa-times me-2"></i> Bekor qilish
+                            </a>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+    /* 1. Header dizayni (Sariq/Tilla gradient) */
+    .edit-card-header {
+        background: linear-gradient(135deg, #f1c40f 0%, #f39c12 100%);
+    }
+    
+    .edit-icon-circle {
+        width: 70px;
+        height: 70px;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(5px);
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid rgba(255, 255, 255, 0.4);
+    }
+
+    /* 2. Input stillari */
+    .form-wrapper input, 
+    .form-wrapper select, 
+    .form-wrapper textarea {
+        display: block;
+        width: 100%;
+        padding: 0.8rem 1.2rem;
+        background-color: #f8f9fa;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        transition: all 0.2s ease;
+    }
+
+    .form-wrapper input:focus, 
+    .form-wrapper textarea:focus {
+        border-color: #f39c12;
+        box-shadow: 0 0 0 4px rgba(243, 156, 18, 0.1);
+        background-color: #fff;
+        outline: none;
+    }
+
+    /* 3. Dark Mode */
+    body.dark-mode .admin-card,
+    body.dark-mode .bg-white-custom {
+        background-color: #1e1e1e !important;
+    }
+    
+    body.dark-mode .form-label { color: #e0e0e0 !important; }
+    
+    body.dark-mode .form-wrapper input,
+    body.dark-mode .form-wrapper select,
+    body.dark-mode .form-wrapper textarea {
+        background-color: #2d2d2d;
+        border-color: #444;
+        color: white;
+    }
+
+    /* 4. Hover effekti */
+    .transition-hover:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(243, 156, 18, 0.3) !important;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const inputs = document.querySelectorAll('.form-wrapper input, .form-wrapper select, .form-wrapper textarea');
+        inputs.forEach(input => {
+            if (input.type !== 'checkbox' && input.type !== 'radio') {
+                input.classList.add('form-control');
+            }
+        });
+    });
+</script>
 {% endblock %}
