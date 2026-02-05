@@ -89,3 +89,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # Login redirect
 LOGIN_REDIRECT_URL = '/users/profile/'
 LOGOUT_REDIRECT_URL = 'index'
+
+
+# Django 3.2+ uchun tavsiya etiladi
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
