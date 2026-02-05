@@ -1,0 +1,35 @@
+# Python
+*.pyc
+*.pyo
+__pycache__/
+*.pyd
+*.pdb
+
+# Env / virtual environment
+venv/
+env/
+ENV/
+.venv/
+
+# Django / PyCharm / VSCode fayllari
+*.sqlite3
+*.log
+*.pot
+*.py[cod]
+*.swp
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Media files
+/media/
+staticfiles/
+static/
+
+# OS fayllari
+.DS_Store
+Thumbs.db
+
+# Secret files
+.env
